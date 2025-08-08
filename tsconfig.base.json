@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Base",
+  "compilerOptions": {
+    "strict": true,
+    "useUnknownInCatchVariables": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@jmpp/config/*": ["./packages/config/src/*"],
+      "@jmpp/config": ["./packages/config/src"],
+      "@jmpp/types/*": ["./packages/types/src/*"],
+      "@jmpp/types": ["./packages/types/src"],
+      "@jmpp/db/*": ["./packages/db/src/*"],
+      "@jmpp/db": ["./packages/db/src"],
+      "@jmpp/api/*": ["./packages/api/src/*"],
+      "@jmpp/api": ["./packages/api/src"]
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "jm-peak-performance",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm run build --filter=!web && pnpm --filter web build",
+    "start": "pnpm --filter web start",
+    "lint": "pnpm --recursive lint",
+    "lint:fix": "pnpm --recursive lint:fix",
+    "format": "pnpm --recursive format",
+    "type-check": "pnpm --recursive type-check",
+    "clean": "pnpm --recursive clean",
+    "test": "pnpm --recursive test",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down -v",
+    "db:logs": "docker compose logs -f db",
+    "db:check": "tsx scripts/check-db.ts",
+    "db:generate": "pnpm --filter @jmpp/db prisma generate",
+    "db:migrate": "pnpm --filter @jmpp/db prisma migrate dev",
+    "db:seed": "pnpm --filter @jmpp/db prisma db seed",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@jmpp/config": "workspace:*",
+    "@types/node": "^20.14.11",
+    "@types/pg": "^8.11.6",
+    "dotenv": "^16.4.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.4",
+    "pg": "^8.12.0",
+    "pnpm": "^9.5.0",
+    "tsx": "^4.16.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.5.0",
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,md,css,scss,yaml,yml}": [
+      "prettier --write"
+    ]
+  }
+}

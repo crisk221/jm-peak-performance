@@ -1,0 +1,254 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  COACH
+  ADMIN
+}
+
+enum Sex {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum Goal {
+  CUT
+  MAINTAIN
+  BULK
+}
+
+enum UnitBase {
+  GRAM
+  ML
+  UNIT
+}
+
+enum IngredientUnit {
+  G
+  ML
+  UNIT
+  TBSP
+  TSP
+  CUP
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+  FAST
+  LONG
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         UserRole
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  clients   Client[]
+  recipes   Recipe[]
+  mealPlans MealPlan[]
+
+  @@map("users")
+}
+
+model Client {
+  id            String  @id @default(cuid())
+  coachId       String
+  name          String
+  sex           Sex
+  age           Int
+  heightCm      Int
+  weightKg      Decimal
+  activityLevel String
+  goal          Goal
+  kcalTarget    Int
+  proteinTarget Int
+  carbsTarget   Int
+  fatTarget     Int
+  preferences   Json // dietaryRestrictions, allergies, dislikedIngredients, cuisines, hardware
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  coach     User       @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  mealPlans MealPlan[]
+
+  @@map("clients")
+}
+
+model Ingredient {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  unitBase   UnitBase
+  kcal100    Decimal
+  protein100 Decimal
+  carbs100   Decimal
+  fat100     Decimal
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  recipeIngredients RecipeIngredient[]
+
+  @@map("ingredients")
+}
+
+model Utensil {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  recipeUtensils RecipeUtensil[]
+
+  @@map("utensils")
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  recipeTags RecipeTag[]
+
+  @@map("tags")
+}
+
+model Recipe {
+  id           String     @id @default(cuid())
+  authorId     String
+  title        String
+  slug         String     @unique
+  description  String?
+  instructions String
+  servings     Int
+  timeMinutes  Int
+  mealType     MealType
+  difficulty   Difficulty
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  author            User               @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  recipeIngredients RecipeIngredient[]
+  recipeUtensils    RecipeUtensil[]
+  recipeTags        RecipeTag[]
+  mealPlanItems     MealPlanItem[]
+
+  @@map("recipes")
+}
+
+model RecipeIngredient {
+  id           String         @id @default(cuid())
+  recipeId     String
+  ingredientId String
+  quantity     Decimal
+  unit         IngredientUnit
+  note         String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  // Relations
+  recipe     Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@map("recipe_ingredients")
+}
+
+model RecipeUtensil {
+  id        String   @id @default(cuid())
+  recipeId  String
+  utensilId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  recipe  Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  utensil Utensil @relation(fields: [utensilId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, utensilId])
+  @@map("recipe_utensils")
+}
+
+model RecipeTag {
+  id        String   @id @default(cuid())
+  recipeId  String
+  tagId     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, tagId])
+  @@map("recipe_tags")
+}
+
+model MealPlan {
+  id        String  @id @default(cuid())
+  clientId  String
+  coachId   String
+  startDate DateTime
+  days      Int
+  kcal      Int
+  protein   Int
+  carbs     Int
+  fat       Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  client        Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  coach         User           @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  mealPlanItems MealPlanItem[]
+
+  @@map("meal_plans")
+}
+
+model MealPlanItem {
+  id         String  @id @default(cuid())
+  mealPlanId String
+  recipeId   String
+  dayIndex   Int
+  mealIndex  Int
+  servings   Decimal
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  mealPlan MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([mealPlanId, dayIndex, mealIndex])
+  @@map("meal_plan_items")
+}

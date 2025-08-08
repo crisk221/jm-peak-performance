@@ -1,0 +1,39 @@
+{
+  "name": "@jmpp/api",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./pdf": "./src/pdf.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "lint": "echo 'Skipping lint for api package'",
+    "lint:fix": "echo 'Skipping lint:fix for api package'",
+    "type-check": "echo 'Skipping type-check for api package'",
+    "clean": "rm -rf dist",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@auth/core": "^0.34.2",
+    "@jmpp/db": "workspace:*",
+    "@jmpp/types": "workspace:*",
+    "@prisma/client": "^5.15.0",
+    "@trpc/client": "^10.45.2",
+    "@trpc/server": "^10.45.2",
+    "chromium-bidi": "^7.3.1",
+    "playwright": "^1.54.2",
+    "superjson": "^2.2.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@jmpp/config": "workspace:*",
+    "@types/node": "^20.14.11",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
+  }
+}

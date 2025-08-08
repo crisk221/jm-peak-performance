@@ -1,0 +1,15 @@
+echo "🔍 Running pre-commit checks..."
+
+# Run linting across all packages
+echo "📝 Linting code..."
+pnpm -w lint || exit 1
+
+# Run type checking across all packages
+echo "🔍 Type checking..."
+pnpm -w type-check || exit 1
+
+# Run lint-staged for formatting
+echo "✨ Formatting staged files..."
+npx lint-staged || exit 1
+
+echo "✅ Pre-commit checks passed!"
