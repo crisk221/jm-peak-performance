@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { Label } from '@/components/ui/label';
+import { ReactNode } from "react";
+import { Label } from "@/components/ui/label";
 
 interface FieldProps {
   label: string;
@@ -7,20 +7,45 @@ interface FieldProps {
   hint?: string;
   children: ReactNode;
   htmlFor?: string;
+  required?: boolean;
 }
 
-export function Field({ label, error, hint, children, htmlFor }: FieldProps) {
+export function Field({
+  label,
+  error,
+  hint,
+  children,
+  htmlFor,
+  required = false,
+}: FieldProps) {
+  const errorId = error ? `${htmlFor}-error` : undefined;
+  const hintId = hint ? `${htmlFor}-hint` : undefined;
+
   return (
     <div className="space-y-2">
       <Label htmlFor={htmlFor} className="text-sm font-medium">
         {label}
+        {required && (
+          <span className="text-destructive ml-1" aria-label="required">
+            *
+          </span>
+        )}
       </Label>
       {children}
       {hint && !error && (
-        <p className="text-xs text-muted-foreground">{hint}</p>
+        <p id={hintId} className="text-xs text-muted-foreground">
+          {hint}
+        </p>
       )}
       {error && (
-        <p className="text-xs text-destructive">{error}</p>
+        <p
+          id={errorId}
+          className="text-xs text-destructive"
+          role="alert"
+          aria-live="polite"
+        >
+          {error}
+        </p>
       )}
     </div>
   );

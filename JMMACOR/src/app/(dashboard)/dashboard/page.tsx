@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { SectionHeader } from "@/components/section-header";
+import { PageLayout } from "@/components/page-layout";
 import {
   Zap,
   ChefHat,
@@ -52,29 +52,27 @@ const quickActions = [
 
 export default function DashboardPage() {
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <SectionHeader
-        title="Welcome to Your Dashboard"
-        description="Manage your nutrition planning workflow and client data from one central location."
-      />
-
+    <PageLayout
+      title="Welcome to Your Dashboard"
+      subtitle="Manage your nutrition planning workflow and client data from one central location."
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {quickActions.map((action) => {
           const IconComponent = action.icon;
           return (
             <Card
               key={action.href}
-              className="p-6 hover:shadow-card transition-all duration-200 hover:border-primary/20 group"
+              className="p-6 hover:shadow-card transition-all duration-200 hover:border-primary/20 group rounded-lg border border-border"
             >
               <div className="flex items-start gap-4">
                 <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
-                  <IconComponent className="h-6 w-6" />
+                  <IconComponent className="h-6 w-6" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-ink dark:text-paper mb-2">
                     {action.title}
                   </h3>
-                  <p className="text-graphite dark:text-paper/70 text-sm mb-4">
+                  <p className="text-graphite dark:text-graphite text-sm mb-4">
                     {action.description}
                   </p>
                   <Button
@@ -141,6 +139,6 @@ export default function DashboardPage() {
           </div>
         </Card>
       </div>
-    </div>
+    </PageLayout>
   );
 }

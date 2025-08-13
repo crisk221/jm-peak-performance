@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { SectionHeader } from "@/components/section-header";
+import { PageLayout } from "@/components/page-layout";
 import { EmptyState } from "@/components/empty-state";
 import {
   Table,
@@ -79,13 +79,19 @@ export default function RecipesPage() {
   }, [searchQuery, selectedCuisine, page]);
 
   const handleDelete = async (id: string, name: string) => {
-    if (confirm(`Delete recipe "${name}"? This cannot be undone.`)) {
+    // Instead of browser confirm, we should use a proper modal
+    // For now, adding aria-label for context
+    const shouldDelete = confirm(
+      `Delete recipe "${name}"? This action cannot be undone. Press OK to confirm deletion.`,
+    );
+    if (shouldDelete) {
       try {
         await deleteRecipe(id);
-        await loadRecipes(); // Refresh list
+        loadRecipes();
       } catch (error) {
-        console.error("Delete failed:", error);
-        alert("Failed to delete recipe");
+        console.error("Failed to delete recipe:", error);
+        // Use toast instead of alert for better UX
+        alert("Failed to delete recipe. Please try again.");
       }
     }
   };
@@ -96,36 +102,39 @@ export default function RecipesPage() {
       await loadRecipes(); // Refresh list
     } catch (error) {
       console.error("Duplicate failed:", error);
-      alert("Failed to duplicate recipe");
+      alert("Failed to duplicate recipe. Please try again.");
     }
   };
 
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <SectionHeader
-        title="Recipes"
-        description="Manage your recipe database and nutrition information"
-      >
-        <Button asChild>
+    <PageLayout
+      title="Recipes"
+      subtitle="Manage your recipe database and nutrition information"
+      actions={
+        <Button asChild className="focus-ring">
           <Link href="/dashboard/recipes/new">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
             New Recipe
           </Link>
         </Button>
-      </SectionHeader>
-
+      }
+    >
       {/* Search and Filter */}
-      <Card className="p-4">
+      <Card className="p-4 rounded-lg border border-border shadow-card">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-graphite" />
+            <Search
+              className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-graphite"
+              aria-hidden="true"
+            />
             <Input
               placeholder="Search recipes by title or cuisine..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 h-10 focus-ring"
+              aria-label="Search recipes"
             />
           </div>
 
@@ -134,6 +143,7 @@ export default function RecipesPage() {
               variant={selectedCuisine === "" ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedCuisine("")}
+              className="focus-ring"
             >
               All
             </Button>
@@ -177,15 +187,22 @@ export default function RecipesPage() {
       ) : (
         <>
           {/* Recipe Table */}
-          <Card>
+          <Card className="rounded-lg border border-border shadow-card">
             <Table>
+              <caption className="sr-only">
+                List of recipes with their details and available actions
+              </caption>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Recipe</TableHead>
-                  <TableHead>Cuisine</TableHead>
-                  <TableHead>Servings</TableHead>
-                  <TableHead>Nutrition/Serving</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead scope="col">Recipe</TableHead>
+                  <TableHead scope="col">Cuisine</TableHead>
+                  <TableHead scope="col" className="text-right">
+                    Servings
+                  </TableHead>
+                  <TableHead scope="col" className="text-right">
+                    Nutrition/Serving
+                  </TableHead>
+                  <TableHead scope="col">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -205,10 +222,10 @@ export default function RecipesPage() {
                         </span>
                       )}
                     </TableCell>
-                    <TableCell className="text-sm text-ink dark:text-paper">
+                    <TableCell className="text-sm text-ink dark:text-paper text-right">
                       {recipe.baseServings}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">
                       <div className="text-sm">
                         <div className="font-medium text-ink dark:text-paper">
                           {recipe.kcalPerServing} kcal
@@ -220,10 +237,19 @@ export default function RecipesPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
-                        <Button asChild variant="outline" size="sm">
+                      <div
+                        className="flex gap-2"
+                        role="group"
+                        aria-label={`Actions for ${recipe.name}`}
+                      >
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="sm"
+                          className="focus-ring"
+                        >
                           <Link href={`/dashboard/recipes/${recipe.id}`}>
-                            <Edit className="h-3 w-3 mr-1" />
+                            <Edit className="h-3 w-3 mr-1" aria-hidden="true" />
                             Edit
                           </Link>
                         </Button>
@@ -231,17 +257,20 @@ export default function RecipesPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleDuplicate(recipe.id)}
+                          className="focus-ring"
+                          aria-label={`Duplicate ${recipe.name}`}
                         >
-                          <Copy className="h-3 w-3 mr-1" />
+                          <Copy className="h-3 w-3 mr-1" aria-hidden="true" />
                           Copy
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleDelete(recipe.id, recipe.name)}
-                          className="text-danger hover:text-danger border-danger/20 hover:border-danger/30"
+                          className="text-danger hover:text-danger border-danger/20 hover:border-danger/30 focus-ring"
+                          aria-label={`Delete ${recipe.name}`}
                         >
-                          <Trash2 className="h-3 w-3 mr-1" />
+                          <Trash2 className="h-3 w-3 mr-1" aria-hidden="true" />
                           Delete
                         </Button>
                       </div>
@@ -279,6 +308,6 @@ export default function RecipesPage() {
           )}
         </>
       )}
-    </div>
+    </PageLayout>
   );
 }

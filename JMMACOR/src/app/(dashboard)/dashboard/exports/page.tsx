@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { SectionHeader } from "@/components/section-header";
+import { PageLayout } from "@/components/page-layout";
 import { EmptyState } from "@/components/empty-state";
 import { Download, Database, BarChart3, FileText, History } from "lucide-react";
 
@@ -44,17 +44,15 @@ export default function ExportsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <SectionHeader
-        title="Data Exports"
-        description="Download backups and export your nutrition planning data."
-      />
-
+    <PageLayout
+      title="Data Exports"
+      subtitle="Download backups and export your nutrition planning data."
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-6 hover:shadow-card transition-all duration-200">
+        <Card className="p-6 hover:shadow-card transition-all duration-200 rounded-lg border border-border">
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-lg bg-primary/10 text-primary">
-              <Download className="h-6 w-6" />
+              <Download className="h-6 w-6" aria-hidden="true" />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-ink dark:text-paper mb-2">
@@ -165,6 +163,6 @@ export default function ExportsPage() {
           body="Export history and logs will appear here once exports are performed."
         />
       </Card>
-    </div>
+    </PageLayout>
   );
 }

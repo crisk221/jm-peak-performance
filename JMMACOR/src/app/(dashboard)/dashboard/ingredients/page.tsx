@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { SectionHeader } from "@/components/section-header";
+import { PageLayout } from "@/components/page-layout";
 import { EmptyState } from "@/components/empty-state";
 import { Plus, Search, Edit, Trash2, Carrot, Upload } from "lucide-react";
 import { useToast } from "@/lib/hooks/useToast";
@@ -90,33 +90,35 @@ export default function IngredientsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <SectionHeader
-        title="Ingredients"
-        description="Manage your ingredient library and nutrition database"
-      >
+    <PageLayout
+      title="Ingredients"
+      subtitle="Manage your ingredient library and nutrition database"
+      actions={
         <div className="flex items-center gap-2">
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild className="focus-ring">
             <Link href="/dashboard/ingredients/import">
-              <Upload className="h-4 w-4 mr-2" />
+              <Upload className="h-4 w-4 mr-2" aria-hidden="true" />
               Import CSV/Excel
             </Link>
           </Button>
-          <Button asChild>
+          <Button asChild className="focus-ring">
             <Link href="/dashboard/ingredients/new">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
               Add Ingredient
             </Link>
           </Button>
         </div>
-      </SectionHeader>
-
-      <Card>
+      }
+    >
+      <Card className="rounded-lg border border-border shadow-card">
         <CardHeader>
           <CardTitle>Ingredient Library</CardTitle>
           <div className="flex items-center space-x-2">
             <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-graphite dark:text-paper/50 h-4 w-4" />
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-graphite dark:text-graphite h-4 w-4"
+                aria-hidden="true"
+              />
               <Input
                 placeholder="Search ingredients..."
                 value={searchTerm}
@@ -161,15 +163,29 @@ export default function IngredientsPage() {
           ) : (
             <>
               <Table>
+                <caption className="sr-only">
+                  List of ingredients with nutritional information and available
+                  actions
+                </caption>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Calories/100g</TableHead>
-                    <TableHead>Protein/100g</TableHead>
-                    <TableHead>Carbs/100g</TableHead>
-                    <TableHead>Fat/100g</TableHead>
-                    <TableHead>Allergens</TableHead>
-                    <TableHead className="w-[100px]">Actions</TableHead>
+                    <TableHead scope="col">Name</TableHead>
+                    <TableHead scope="col" className="text-right">
+                      Calories/100g
+                    </TableHead>
+                    <TableHead scope="col" className="text-right">
+                      Protein/100g
+                    </TableHead>
+                    <TableHead scope="col" className="text-right">
+                      Carbs/100g
+                    </TableHead>
+                    <TableHead scope="col" className="text-right">
+                      Fat/100g
+                    </TableHead>
+                    <TableHead scope="col">Allergens</TableHead>
+                    <TableHead scope="col" className="w-[100px]">
+                      Actions
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -178,14 +194,18 @@ export default function IngredientsPage() {
                       <TableCell className="font-medium">
                         {ingredient.name}
                       </TableCell>
-                      <TableCell>{ingredient.kcalPer100g.toFixed(1)}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-right">
+                        {ingredient.kcalPer100g.toFixed(1)}
+                      </TableCell>
+                      <TableCell className="text-right">
                         {ingredient.proteinPer100g.toFixed(1)}g
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-right">
                         {ingredient.carbsPer100g.toFixed(1)}g
                       </TableCell>
-                      <TableCell>{ingredient.fatPer100g.toFixed(1)}g</TableCell>
+                      <TableCell className="text-right">
+                        {ingredient.fatPer100g.toFixed(1)}g
+                      </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {ingredient.allergens.map((allergen) => (
@@ -200,12 +220,21 @@ export default function IngredientsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center space-x-2">
+                        <div
+                          className="flex items-center space-x-2"
+                          role="group"
+                          aria-label={`Actions for ${ingredient.name}`}
+                        >
                           <Link
                             href={`/dashboard/ingredients/${ingredient.id}`}
                           >
-                            <Button variant="ghost" size="sm">
-                              <Edit className="h-4 w-4" />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="focus-ring min-h-[40px]"
+                              aria-label={`Edit ${ingredient.name}`}
+                            >
+                              <Edit className="h-4 w-4" aria-hidden="true" />
                             </Button>
                           </Link>
                           <Button
@@ -215,8 +244,10 @@ export default function IngredientsPage() {
                               handleDelete(ingredient.id, ingredient.name)
                             }
                             disabled={deleting === ingredient.id}
+                            className="focus-ring min-h-[40px]"
+                            aria-label={`Delete ${ingredient.name}`}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4" aria-hidden="true" />
                           </Button>
                         </div>
                       </TableCell>
@@ -252,6 +283,6 @@ export default function IngredientsPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </PageLayout>
   );
 }

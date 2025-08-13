@@ -33,10 +33,10 @@ export function MetricBadge({
   }
 
   const stateStyles = {
-    neutral: "bg-muted text-ink border-border",
-    ok: "bg-success/10 text-success border-success/20",
-    warn: "bg-warning/10 text-warning border-warning/20",
-    over: "bg-danger/10 text-danger border-danger/20",
+    neutral: "border border-border text-ink dark:text-paper",
+    ok: "border border-border text-ink dark:text-paper",
+    warn: "badge-soft-warning border-0",
+    over: "badge-soft-danger border-0",
   };
 
   return (

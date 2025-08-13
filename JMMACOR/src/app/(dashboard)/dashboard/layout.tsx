@@ -32,7 +32,10 @@ function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="w-64 min-h-screen bg-paper dark:bg-ink border-r border-border dark:border-graphite/30 p-4">
+    <nav
+      className="w-64 min-h-screen bg-paper dark:bg-ink border-r border-border dark:border-graphite/30 p-4"
+      aria-label="Dashboard navigation"
+    >
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-ink dark:text-paper">
           {appSettings.brandName}
@@ -44,7 +47,7 @@ function SidebarNav() {
 
       <Separator className="mb-4" />
 
-      <ul className="space-y-1">
+      <ul className="space-y-1" role="list">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const IconComponent = item.icon;
@@ -52,13 +55,14 @@ function SidebarNav() {
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors min-h-[40px] focus-ring ${
                   isActive
                     ? "bg-primary/10 text-primary border border-primary/20 font-medium"
                     : "text-graphite dark:text-paper/70 hover:bg-border/50 dark:hover:bg-graphite/50 hover:text-ink dark:hover:text-paper"
                 }`}
+                aria-current={isActive ? "page" : undefined}
               >
-                <IconComponent className="h-4 w-4" />
+                <IconComponent className="h-4 w-4" aria-hidden="true" />
                 {item.label}
               </Link>
             </li>
@@ -71,9 +75,9 @@ function SidebarNav() {
       <div className="text-xs text-graphite dark:text-paper/50">
         <Link
           href="/"
-          className="flex items-center gap-2 hover:text-ink dark:hover:text-paper transition-colors"
+          className="flex items-center gap-2 hover:text-ink dark:hover:text-paper transition-colors min-h-[40px] focus-ring"
         >
-          <ArrowLeft className="h-3 w-3" />
+          <ArrowLeft className="h-3 w-3" aria-hidden="true" />
           Back to Home
         </Link>
       </div>
@@ -94,7 +98,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               Dashboard
             </h1>
             <div className="flex items-center gap-4">
-              <Button asChild>
+              <Button asChild className="focus-ring">
                 <Link href="/wizard/intake">New Client Wizard</Link>
               </Button>
             </div>
@@ -102,7 +106,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </header>
 
         {/* Main content */}
-        <main className="p-6 bg-paper dark:bg-ink min-h-screen">
+        <main
+          className="p-6 bg-paper dark:bg-ink min-h-screen"
+          id="dashboard-main"
+        >
           {children}
         </main>
       </div>

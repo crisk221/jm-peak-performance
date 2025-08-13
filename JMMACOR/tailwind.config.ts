@@ -10,15 +10,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand colors
+        // JM Peak Performance brand colors with WCAG AA variants
         ink: "hsl(var(--ink))",
         paper: "hsl(var(--paper))",
-        graphite: "hsl(var(--graphite))",
         border: "hsl(var(--border))",
-        primary: "hsl(var(--primary))",
-        success: "hsl(var(--success))",
-        warning: "hsl(var(--warning))",
-        danger: "hsl(var(--danger))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        graphite: {
+          DEFAULT: "hsl(var(--graphite))",
+          foreground: "hsl(var(--graphite-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+          soft: "hsl(var(--success-soft))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+          soft: "hsl(var(--warning-soft))",
+        },
+        danger: {
+          DEFAULT: "hsl(var(--danger))",
+          foreground: "hsl(var(--danger-foreground))",
+          soft: "hsl(var(--danger-soft))",
+        },
 
         // Shadcn defaults (keeping for compatibility)
         background: "hsl(var(--background))",

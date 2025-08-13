@@ -4,68 +4,94 @@
 
 @layer base {
   :root {
-    /* JM Peak Performance Brand Colors */
-    --ink: 213 23% 7%; /* #0D0F12 */
+    /* JM Peak Performance Brand Colors - WCAG AA Compliant */
+    --ink: 222 84% 7%; /* #0A0C0F - Darker ink for better contrast */
     --paper: 210 40% 98%; /* #F8FAFC */
-    --graphite: 220 6% 46%; /* #74767B */
-    --border: 220 13% 91%; /* #E5E7EB */
+    --border: 214 32% 91%; /* #E5E7EB */
     --primary: 221 83% 53%; /* #2563EB */
-    --success: 158 64% 52%; /* #10B981 */
-    --warning: 32 95% 44%; /* #F59E0B */
-    --danger: 347 77% 50%; /* #E11D48 */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF */
+
+    /* WCAG AA Compliant Semantic Colors */
+    --graphite: 215 13% 34%; /* #525760 - Darker for AA compliance */
+    --graphite-foreground: 0 0% 100%; /* #FFFFFF */
+
+    --success: 160 88% 26%; /* #047857 (emerald 700) - AA compliant */
+    --success-foreground: 150 81% 96%; /* #ECFDF5 */
+    --success-soft: 152 76% 89%; /* #D1FAE5 */
+
+    --warning: 31 92% 37%; /* #B45309 (amber 700) - AA compliant */
+    --warning-foreground: 48 100% 96%; /* #FFFBEB */
+    --warning-soft: 37 92% 88%; /* #FEF3C7 */
+
+    --danger: 356 86% 36%; /* #B91C1C (red 700) - AA compliant */
+    --danger-foreground: 0 86% 97%; /* #FEF2F2 */
+    --danger-soft: 0 86% 88%; /* #FEE2E2 */
 
     /* Shadcn compatibility */
     --background: 210 40% 98%; /* paper */
-    --foreground: 213 23% 7%; /* ink */
+    --foreground: 222 84% 7%; /* ink */
     --card: 0 0% 100%;
-    --card-foreground: 213 23% 7%;
+    --card-foreground: 222 84% 7%;
     --popover: 0 0% 100%;
-    --popover-foreground: 213 23% 7%;
+    --popover-foreground: 222 84% 7%;
     --secondary: 210 40% 95%;
-    --secondary-foreground: 213 23% 7%;
+    --secondary-foreground: 222 84% 7%;
     --muted: 210 40% 95%;
-    --muted-foreground: 220 6% 46%;
+    --muted-foreground: 215 13% 34%;
     --accent: 210 40% 95%;
-    --accent-foreground: 213 23% 7%;
-    --destructive: 347 77% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --input: 220 13% 91%;
+    --accent-foreground: 222 84% 7%;
+    --destructive: 356 86% 36%;
+    --destructive-foreground: 0 86% 97%;
+    --input: 214 32% 91%;
     --ring: 221 83% 53%;
     --chart-1: 221 83% 53%;
-    --chart-2: 158 64% 52%;
-    --chart-3: 32 95% 44%;
-    --chart-4: 347 77% 50%;
-    --chart-5: 220 6% 46%;
+    --chart-2: 160 88% 26%;
+    --chart-3: 31 92% 37%;
+    --chart-4: 356 86% 36%;
+    --chart-5: 215 13% 34%;
     --radius: 0.5rem;
   }
 
   .dark {
-    /* Dark theme - inverted */
-    --ink: 0 0% 98%; /* Light text */
-    --paper: 213 23% 7%; /* Dark background */
-    --graphite: 220 6% 65%; /* Lighter graphite */
-    --border: 213 19% 20%; /* Dark border */
+    /* Dark theme - enhanced contrast */
+    --ink: 210 40% 94%; /* Light text */
+    --paper: 214 32% 7%; /* #151B23 - Darker background */
+    --border: 215 28% 17%; /* Dark border */
     --primary: 221 83% 53%; /* Keep primary blue */
-    --success: 158 64% 52%; /* Keep success green */
-    --warning: 32 95% 44%; /* Keep warning orange */
-    --danger: 347 77% 50%; /* Keep danger red */
+    --primary-foreground: 0 0% 100%;
 
-    /* Shadcn dark theme */
-    --background: 213 23% 7%;
-    --foreground: 0 0% 98%;
-    --card: 213 19% 12%;
-    --card-foreground: 0 0% 98%;
-    --popover: 213 19% 12%;
-    --popover-foreground: 0 0% 98%;
-    --secondary: 213 19% 15%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 213 19% 15%;
-    --muted-foreground: 220 6% 65%;
-    --accent: 213 19% 15%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 347 77% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --input: 213 19% 20%;
+    /* Adjusted for dark backgrounds */
+    --graphite: 215 13% 60%; /* Lighter for dark theme */
+    --graphite-foreground: 214 32% 7%;
+
+    --success: 160 88% 40%; /* Brighter for dark */
+    --success-foreground: 150 81% 96%;
+    --success-soft: 152 76% 15%; /* Darker soft background for dark theme */
+
+    --warning: 31 92% 50%; /* Brighter for dark */
+    --warning-foreground: 48 100% 96%;
+    --warning-soft: 37 92% 18%;
+
+    --danger: 356 86% 50%; /* Brighter for dark */
+    --danger-foreground: 0 86% 97%;
+    --danger-soft: 0 86% 18%;
+
+    /* Shadcn dark compatibility */
+    --background: 214 32% 7%;
+    --foreground: 210 40% 94%;
+    --card: 214 32% 7%;
+    --card-foreground: 210 40% 94%;
+    --popover: 214 32% 7%;
+    --popover-foreground: 210 40% 94%;
+    --secondary: 215 28% 17%;
+    --secondary-foreground: 210 40% 94%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 215 13% 60%;
+    --accent: 215 28% 17%;
+    --accent-foreground: 210 40% 94%;
+    --destructive: 356 86% 50%;
+    --destructive-foreground: 0 86% 97%;
+    --input: 215 28% 17%;
     --ring: 221 83% 53%;
   }
 }
@@ -82,5 +108,38 @@
 @layer utilities {
   .focus-ring {
     @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-paper;
+  }
+
+  /* Soft badge utilities for warn/over states */
+  .badge-soft-success {
+    background: hsl(var(--success-soft));
+    color: hsl(var(--success));
+  }
+  .badge-soft-warning {
+    background: hsl(var(--warning-soft));
+    color: hsl(var(--warning));
+  }
+  .badge-soft-danger {
+    background: hsl(var(--danger-soft));
+    color: hsl(var(--danger));
+  }
+
+  /* Card shadow utility */
+  .shadow-card {
+    box-shadow:
+      0 1px 3px 0 rgb(0 0 0 / 0.1),
+      0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
