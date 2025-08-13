@@ -1,62 +1,80 @@
-'use client';
+"use client";
 
-import { ReactNode } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { appSettings } from '@/lib/app-settings';
+import { ReactNode } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { appSettings } from "@/lib/app-settings";
+import {
+  BarChart3,
+  ChefHat,
+  Carrot,
+  Download,
+  Settings,
+  ArrowLeft,
+} from "lucide-react";
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: '📊' },
-  { href: '/dashboard/recipes', label: 'Recipes', icon: '🍳' },
-  { href: '/dashboard/ingredients', label: 'Ingredients', icon: '🥗' },
-  { href: '/dashboard/exports', label: 'Exports', icon: '📤' },
-  { href: '/dashboard/settings', label: 'Settings', icon: '⚙️' },
+  { href: "/dashboard", label: "Overview", icon: BarChart3 },
+  { href: "/dashboard/recipes", label: "Recipes", icon: ChefHat },
+  { href: "/dashboard/ingredients", label: "Ingredients", icon: Carrot },
+  { href: "/dashboard/exports", label: "Exports", icon: Download },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="w-64 min-h-screen bg-gray-50 border-r border-gray-200 p-4">
+    <nav className="w-64 min-h-screen bg-paper dark:bg-ink border-r border-border dark:border-graphite/30 p-4">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900">{appSettings.brandName}</h2>
-        <Badge variant="secondary" className="mt-1">Dashboard</Badge>
+        <h2 className="text-lg font-semibold text-ink dark:text-paper">
+          {appSettings.brandName}
+        </h2>
+        <Badge variant="secondary" className="mt-1">
+          Dashboard
+        </Badge>
       </div>
-      
+
       <Separator className="mb-4" />
-      
-      <ul className="space-y-2">
+
+      <ul className="space-y-1">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
+          const IconComponent = item.icon;
           return (
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                  isActive 
-                    ? 'bg-blue-100 text-blue-700 font-medium' 
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  isActive
+                    ? "bg-primary/10 text-primary border border-primary/20 font-medium"
+                    : "text-graphite dark:text-paper/70 hover:bg-border/50 dark:hover:bg-graphite/50 hover:text-ink dark:hover:text-paper"
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                <IconComponent className="h-4 w-4" />
                 {item.label}
               </Link>
             </li>
           );
         })}
       </ul>
-      
+
       <Separator className="my-6" />
-      
-      <div className="text-xs text-gray-500">
-        <Link href="/" className="hover:text-gray-700 underline">
-          ← Back to Home
+
+      <div className="text-xs text-graphite dark:text-paper/50">
+        <Link
+          href="/"
+          className="flex items-center gap-2 hover:text-ink dark:hover:text-paper transition-colors"
+        >
+          <ArrowLeft className="h-3 w-3" />
+          Back to Home
         </Link>
       </div>
     </nav>
@@ -65,27 +83,26 @@ function SidebarNav() {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-paper dark:bg-ink">
       <SidebarNav />
-      
+
       <div className="flex-1">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <header className="bg-paper dark:bg-ink/50 border-b border-border dark:border-graphite/30 px-6 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+            <h1 className="text-2xl font-bold text-ink dark:text-paper">
+              Dashboard
+            </h1>
             <div className="flex items-center gap-4">
-              <Link 
-                href="/wizard/intake" 
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                New Client Wizard
-              </Link>
+              <Button asChild>
+                <Link href="/wizard/intake">New Client Wizard</Link>
+              </Button>
             </div>
           </div>
         </header>
-        
+
         {/* Main content */}
-        <main className="p-6">
+        <main className="p-6 bg-paper dark:bg-ink min-h-screen">
           {children}
         </main>
       </div>
