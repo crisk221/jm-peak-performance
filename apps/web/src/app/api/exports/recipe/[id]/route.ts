@@ -6,6 +6,10 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // Temporarily disabled - PDF generation causes build issues
+  return NextResponse.json({ error: "PDF export temporarily disabled" }, { status: 503 });
+  
+  /*
   try {
     // Dynamic import to avoid bundling Playwright
     const { renderRecipePdf } = await import("@jmpp/api/pdf");
@@ -41,4 +45,5 @@ export async function GET(
       { status: 500 }
     );
   }
+  */
 }

@@ -1,12 +1,13 @@
-import { redirect } from "next/navigation";
-import { getServerAuthSession } from "../../lib/auth";
-
 export default async function Home() {
-  const session = await getServerAuthSession();
-
-  if (session?.user) {
-    redirect("/dashboard");
-  } else {
-    redirect("/sign-in");
-  }
+  // Simple test page without redirects
+  return (
+    <div style={{ padding: '20px' }}>
+      <h1>JM Peak Performance</h1>
+      <p>Welcome to the Nutrition Coaching Platform</p>
+      <div style={{ marginTop: '20px' }}>
+        <a href="/sign-in" style={{ marginRight: '10px', color: 'blue' }}>Sign In</a>
+        <a href="/sign-up" style={{ color: 'blue' }}>Sign Up</a>
+      </div>
+    </div>
+  );
 }

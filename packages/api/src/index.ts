@@ -6,6 +6,8 @@ import { healthRouter } from "./routers/health";
 import { userRouter } from "./routers/user";
 import { clientRouter } from "./routers/client";
 import { recipeRouter } from "./routers/recipe";
+import { mealPlanRouter } from "./routers/mealPlan";
+import { ingredientRouter } from "./routers/ingredient";
 
 // Export context creation for Next.js API routes
 export { createContext as createTRPCContext } from "./context";
@@ -22,6 +24,8 @@ export const appRouter = createTRPCRouter({
   user: userRouter,
   client: clientRouter,
   recipe: recipeRouter,
+  mealPlan: mealPlanRouter,
+  ingredient: ingredientRouter,
 });
 
 /**

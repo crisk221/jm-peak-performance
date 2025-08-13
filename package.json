@@ -11,7 +11,8 @@
     "format": "pnpm --recursive format",
     "type-check": "pnpm --recursive type-check",
     "clean": "pnpm --recursive clean",
-    "test": "pnpm --recursive test",
+    "test": "vitest",
+    "test:e2e": "playwright test",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down -v",
     "db:logs": "docker compose logs -f db",
@@ -19,18 +20,22 @@
     "db:generate": "pnpm --filter @jmpp/db prisma generate",
     "db:migrate": "pnpm --filter @jmpp/db prisma migrate dev",
     "db:seed": "pnpm --filter @jmpp/db prisma db seed",
+    "ingredients:import": "tsx packages/db/scripts/import-ingredients.ts",
     "prepare": "husky"
   },
   "devDependencies": {
     "@jmpp/config": "workspace:*",
+    "@playwright/test": "^1.54.2",
     "@types/node": "^20.14.11",
     "@types/pg": "^8.11.6",
+    "@vitest/ui": "^3.2.4",
     "dotenv": "^16.4.5",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.4",
     "pg": "^8.12.0",
     "pnpm": "^9.5.0",
-    "tsx": "^4.16.2"
+    "tsx": "^4.20.3",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=20.0.0",
@@ -41,5 +46,8 @@
     "*.{js,jsx,ts,tsx,json,md,css,scss,yaml,yml}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
   }
 }

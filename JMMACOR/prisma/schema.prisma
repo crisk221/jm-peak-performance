@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id           String   @id @default(cuid())
+  fullName     String
+  gender       String      // keep as string for now; migrate to enum later
+  age          Int
+  heightCm     Int
+  weightKg     Float       // Using Float for SQLite compatibility
+  activity     String      // keep as string; we'll lock labels to calculator.net later
+  goal         String
+  allergies    String      // JSON string for arrays in SQLite
+  cuisines     String      // JSON string for arrays in SQLite
+  dislikes     String      // JSON string for arrays in SQLite
+  includeMeals String      // JSON string: ["Breakfast","Lunch","Dinner","Snacks","Shakes"]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  plans        Plan[]
+}
+
+model Plan {
+  id         String   @id @default(cuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id])
+  kcalTarget Int
+  proteinG   Int
+  carbsG     Int
+  fatG       Int
+  splitType  String   // 'balanced' | 'lowFat' | 'lowCarb' | 'highProtein' | 'custom'
+  custom     String?  // JSON string for SQLite
+  formula    String?  // BMR formula used: 'mifflin' | 'harris' | 'katch'
+  createdAt  DateTime @default(now())
+  meals      Meal[]
+}
+
+model Meal {
+  id        String   @id @default(cuid())
+  planId    String
+  plan      Plan     @relation(fields: [planId], references: [id])
+  slot      String   // 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Shake'
+  recipeId  String?
+  recipe    Recipe?  @relation(fields: [recipeId], references: [id])
+  servings  Float    // Using Float for SQLite compatibility
+  kcal      Int
+  protein   Float    // Changed from proteinG to protein for consistency
+  carbs     Float    // Changed from carbsG to carbs for consistency
+  fat       Float    // Changed from fatG to fat for consistency
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ingredient {
+  id            String  @id @default(cuid())
+  name          String  @unique
+  kcalPer100g   Float   // Using Float for SQLite compatibility
+  proteinPer100g Float  // Using Float for SQLite compatibility
+  carbsPer100g  Float   // Using Float for SQLite compatibility
+  fatPer100g    Float   // Using Float for SQLite compatibility
+  allergens     String  // JSON string for arrays in SQLite
+  createdAt     DateTime @default(now())
+  recipes       RecipeIngredient[]
+}
+
+model Recipe {
+  id            String  @id @default(cuid())
+  name          String  // Changed from title to name for consistency
+  cuisine       String?
+  difficulty    String?   // Easy / Medium / Hard / Fast / Long (optional)
+  utensils      String   // JSON string for arrays in SQLite
+  baseServings  Float    // Using Float for SQLite compatibility
+  instructions  String
+  createdAt     DateTime @default(now())
+  ingredients   RecipeIngredient[]
+  meals         Meal[]
+}
+
+model RecipeIngredient {
+  id           String  @id @default(cuid())
+  recipeId     String
+  ingredientId String
+  gramsPerBase Float   // Using Float for SQLite compatibility
+  recipe       Recipe     @relation(fields: [recipeId], references: [id])
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+}

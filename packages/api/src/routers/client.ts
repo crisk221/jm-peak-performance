@@ -2,8 +2,9 @@ import { z } from "zod";
 import { protectedProcedure, createTRPCRouter } from "../trpc";
 import {
   ClientSchema,
-  ClientCreateSchema,
-  ClientUpdateSchema,
+  ClientCreateInputSchema,
+  ClientUpdateInputSchema,
+  ClientListInputSchema,
 } from "@jmpp/types";
 
 /**
@@ -11,21 +12,37 @@ import {
  */
 export const clientRouter = createTRPCRouter({
   /**
-   * Get all clients for the current coach
+   * Get all clients for the current coach with optional search
    */
   list: protectedProcedure
+    .input(ClientListInputSchema)
     .output(z.array(ClientSchema))
-    .query(async ({ ctx }) => {
+    .query(async ({ ctx, input }) => {
       const coachId = ctx.session.user.id;
 
+      const where = {
+        coachId,
+        ...(input.search && {
+          name: {
+            contains: input.search,
+            mode: "insensitive" as const,
+          },
+        }),
+      };
+
       return await ctx.prisma.client.findMany({
-        where: { coachId },
+        where,
         orderBy: { createdAt: "desc" },
+        take: input.limit,
+        ...(input.cursor && {
+          skip: 1,
+          cursor: { id: input.cursor },
+        }),
       });
     }),
 
   /**
-   * Get a specific client by ID
+   * Get a specific client by ID with full details
    */
   getById: protectedProcedure
     .input(z.object({ id: z.string() }))
@@ -51,7 +68,7 @@ export const clientRouter = createTRPCRouter({
    * Create a new client
    */
   create: protectedProcedure
-    .input(ClientCreateSchema)
+    .input(ClientCreateInputSchema)
     .output(ClientSchema)
     .mutation(async ({ ctx, input }) => {
       const coachId = ctx.session.user.id;
@@ -68,20 +85,16 @@ export const clientRouter = createTRPCRouter({
    * Update an existing client
    */
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        data: ClientUpdateSchema,
-      }),
-    )
+    .input(ClientUpdateInputSchema)
     .output(ClientSchema)
     .mutation(async ({ ctx, input }) => {
       const coachId = ctx.session.user.id;
+      const { id, ...data } = input;
 
       // First verify the client belongs to this coach
       const existingClient = await ctx.prisma.client.findFirst({
         where: {
-          id: input.id,
+          id,
           coachId,
         },
       });
@@ -91,8 +104,8 @@ export const clientRouter = createTRPCRouter({
       }
 
       return await ctx.prisma.client.update({
-        where: { id: input.id },
-        data: input.data,
+        where: { id },
+        data,
       });
     }),
 

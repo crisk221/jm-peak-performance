@@ -1,0 +1,11 @@
+name,kcal_per_100,protein_per_100,carbs_per_100,fat_per_100,allergens
+Chicken Breast (raw),165,31,0,3,
+Brown Rice (dry),370,7.9,76,2,gluten-free
+Olive Oil,884,0,0,100,
+Almonds,579,21.15,21.55,49.93,"tree nuts"
+Whole Milk,61,3.4,4.8,3.3,dairy
+Salmon (farmed),206,22,0,12,fish
+Bread (whole wheat),247,13,41,4,"gluten, wheat"
+Greek Yogurt,59,10,3.6,0.4,dairy
+Quinoa (cooked),120,4.4,21.3,1.9,
+Spinach,23,2.9,3.6,0.4,

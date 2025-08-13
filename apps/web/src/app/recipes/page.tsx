@@ -100,6 +100,7 @@ export default function RecipesPage() {
               setPage(1); // Reset to first page when searching
             }}
             className="max-w-md"
+            aria-label="Search recipes by title or ingredients"
           />
         </div>
 
@@ -166,12 +167,14 @@ export default function RecipesPage() {
                         <Link
                           href={`/recipes/${recipe.id}`}
                           className="inline-flex h-9 flex-1 items-center justify-center whitespace-nowrap rounded-md bg-blue-600 px-3 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                          aria-label={`View ${recipe.title} recipe`}
                         >
                           View
                         </Link>
                         <Link
                           href={`/recipes/${recipe.id}/edit`}
                           className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md border border-gray-300 bg-white px-3 text-sm font-medium transition-colors hover:bg-gray-50"
+                          aria-label={`Edit ${recipe.title} recipe`}
                         >
                           Edit
                         </Link>
@@ -180,6 +183,7 @@ export default function RecipesPage() {
                           variant="destructive"
                           onClick={() => handleDelete(recipe.id, recipe.title)}
                           disabled={deleteRecipe.isLoading}
+                          aria-label={`Delete ${recipe.title} recipe`}
                         >
                           Delete
                         </Button>

@@ -1,0 +1,42 @@
+{
+  "presets": {
+    "balanced": {
+      "name": "Balanced",
+      "carbs": 50,
+      "protein": 25,
+      "fat": 25,
+      "description": "A balanced macro split for general health"
+    },
+    "lowFat": {
+      "name": "Low Fat",
+      "carbs": 60,
+      "protein": 25,
+      "fat": 15,
+      "description": "Higher carbs, lower fat for endurance training"
+    },
+    "lowCarb": {
+      "name": "Low Carb",
+      "carbs": 25,
+      "protein": 40,
+      "fat": 35,
+      "description": "Lower carbs for ketogenic or low-carb diets"
+    },
+    "highProtein": {
+      "name": "High Protein",
+      "carbs": 35,
+      "protein": 40,
+      "fat": 25,
+      "description": "Higher protein for muscle building and recovery"
+    }
+  },
+  "limits": {
+    "minCalories": 1200,
+    "maxCalories": 5000,
+    "minProtein": 0.8,
+    "maxProtein": 3.0,
+    "minCarbs": 0.1,
+    "maxCarbs": 0.8,
+    "minFat": 0.15,
+    "maxFat": 0.7
+  }
+}

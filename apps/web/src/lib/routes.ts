@@ -9,9 +9,12 @@ export const routes = {
   dashboard: "/dashboard",
 
   // Feature routes (to be implemented)
-  clients: "/clients",
-  recipes: "/recipes",
-  mealPlans: "/meal-plans",
+  clients: "/dashboard/clients",
+  clientNew: "/dashboard/clients/new",
+  recipes: "/dashboard/recipes",
+  recipeNew: "/dashboard/recipes/new",
+  mealPlans: "/dashboard/meal-plans",
+  mealPlanNew: "/dashboard/meal-plans/new",
 
   // Debug routes
   debugHealth: "/debug/health",
@@ -25,12 +28,17 @@ export const routes = {
  * Helper functions for dynamic routes
  */
 export const dynamicRoutes = {
-  client: (id: string) => `/clients/${id}`,
-  recipe: (id: string) => `/recipes/${id}`,
-  mealPlan: (id: string) => `/meal-plans/${id}`,
-  editClient: (id: string) => `/clients/${id}/edit`,
-  editRecipe: (id: string) => `/recipes/${id}/edit`,
-  editMealPlan: (id: string) => `/meal-plans/${id}/edit`,
+  client: (id: string) => `/dashboard/clients/${id}`,
+  clientEdit: (id: string) => `/dashboard/clients/${id}/edit`,
+  clientNew: () => `/dashboard/clients/new`,
+  recipe: (id: string) => `/dashboard/recipes/${id}`,
+  recipeEdit: (id: string) => `/dashboard/recipes/${id}/edit`,
+  recipeNew: () => `/dashboard/recipes/new`,
+  mealPlan: (id: string) => `/dashboard/meal-plans/${id}`,
+  mealPlanNew: () => `/dashboard/meal-plans/new`,
+  editClient: (id: string) => `/dashboard/clients/${id}/edit`,
+  editRecipe: (id: string) => `/dashboard/recipes/${id}/edit`,
+  editMealPlan: (id: string) => `/dashboard/meal-plans/${id}/edit`,
 } as const;
 
 /**

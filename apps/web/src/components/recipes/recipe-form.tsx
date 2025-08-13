@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "../../../components/ui/card";
 import { LoadingSpinner } from "../ui/loading-spinner";
+import { useDebounce } from "../../../src/hooks/use-debounce";
 
 // Form schema
 const recipeFormSchema = z.object({
@@ -56,9 +57,16 @@ interface RecipeFormProps {
 export function RecipeForm({ recipeId, initialData }: RecipeFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [ingredientSearch, setIngredientSearch] = useState("");
+
+  // Debounce ingredient search to avoid too many API calls
+  const debouncedIngredientSearch = useDebounce(ingredientSearch, 300);
 
   // Fetch helper data
-  const ingredientsQuery = trpc.recipe.ingredients.useQuery();
+  const ingredientsQuery = trpc.ingredient.list.useQuery({
+    search: debouncedIngredientSearch || undefined,
+    limit: 50,
+  });
   const utensilsQuery = trpc.recipe.utensils.useQuery();
   const tagsQuery = trpc.recipe.tags.useQuery();
 
@@ -265,6 +273,19 @@ export function RecipeForm({ recipeId, initialData }: RecipeFormProps) {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Ingredient Search */}
+          <div className="mb-4">
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Search Ingredients
+            </label>
+            <Input
+              placeholder="Type to search ingredients..."
+              value={ingredientSearch}
+              onChange={(e) => setIngredientSearch(e.target.value)}
+              className="max-w-md"
+            />
+          </div>
+
           {ingredientFields.map((field, index) => (
             <div key={field.id} className="grid grid-cols-12 items-end gap-4">
               <div className="col-span-4">
@@ -278,7 +299,7 @@ export function RecipeForm({ recipeId, initialData }: RecipeFormProps) {
                   <option value="">Select ingredient...</option>
                   {ingredientsQuery.data?.map((ingredient: any) => (
                     <option key={ingredient.id} value={ingredient.id}>
-                      {ingredient.name}
+                      {ingredient.name} ({ingredient.unitBase.toLowerCase()})
                     </option>
                   ))}
                 </select>

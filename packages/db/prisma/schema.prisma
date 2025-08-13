@@ -27,6 +27,14 @@ enum Goal {
   BULK
 }
 
+enum ActivityLevel {
+  SEDENTARY
+  LIGHTLY_ACTIVE
+  MODERATELY_ACTIVE
+  VERY_ACTIVE
+  EXTRA_ACTIVE
+}
+
 enum UnitBase {
   GRAM
   ML
@@ -82,7 +90,7 @@ model Client {
   age           Int
   heightCm      Int
   weightKg      Decimal
-  activityLevel String
+  activityLevel ActivityLevel
   goal          Goal
   kcalTarget    Int
   proteinTarget Int
@@ -107,6 +115,8 @@ model Ingredient {
   protein100 Decimal
   carbs100   Decimal
   fat100     Decimal
+  category   String?
+  aliases    Json?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
