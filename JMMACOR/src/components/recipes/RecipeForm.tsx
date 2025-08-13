@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { createRecipe, updateRecipe } from '@/app/actions/recipes';
-import { recipeSchema, type RecipeFormData } from '@/schemas/recipe';
-import { calcRecipePerServing, formatMacros } from '@/lib/nutrition';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { ChipInput } from '@/components/ChipInput';
-import IngredientPicker from './IngredientPicker';
+import { useState, useEffect } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createRecipe, updateRecipe } from "@/app/actions/recipes";
+import { recipeSchema, type RecipeFormData } from "@/schemas/recipe";
+import { calcRecipePerServing, formatMacros } from "@/lib/nutrition";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { ChipInput } from "@/components/ChipInput";
+import IngredientPicker from "./IngredientPicker";
 
 interface RecipeFormProps {
   initialData?: {
@@ -48,7 +48,9 @@ interface IngredientRow {
 export default function RecipeForm({ initialData }: RecipeFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showIngredientPicker, setShowIngredientPicker] = useState(false);
-  const [ingredientData, setIngredientData] = useState<Map<string, { name: string; per100: any }>>(new Map());
+  const [ingredientData, setIngredientData] = useState<
+    Map<string, { name: string; per100: any }>
+  >(new Map());
 
   const isEditing = !!initialData?.id;
 
@@ -56,45 +58,46 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
   const form = useForm<RecipeFormData>({
     resolver: zodResolver(recipeSchema),
     defaultValues: {
-      title: initialData?.name || '',
-      cuisine: initialData?.cuisine || '',
-      difficulty: initialData?.difficulty as any || undefined,
+      title: initialData?.name || "",
+      cuisine: initialData?.cuisine || "",
+      difficulty: (initialData?.difficulty as any) || undefined,
       utensils: initialData?.utensils ? JSON.parse(initialData.utensils) : [],
       baseServings: initialData?.baseServings || 2,
-      instructions: initialData?.instructions || '',
-      ingredients: initialData?.ingredients?.map(ing => ({
-        ingredientId: ing.ingredientId,
-        gramsPerBase: ing.gramsPerBase
-      })) || []
-    }
+      instructions: initialData?.instructions || "",
+      ingredients:
+        initialData?.ingredients?.map((ing) => ({
+          ingredientId: ing.ingredientId,
+          gramsPerBase: ing.gramsPerBase,
+        })) || [],
+    },
   });
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'ingredients'
+    name: "ingredients",
   });
 
   // Initialize ingredient data map
   useEffect(() => {
     if (initialData?.ingredients) {
       const dataMap = new Map();
-      initialData.ingredients.forEach(ing => {
+      initialData.ingredients.forEach((ing) => {
         dataMap.set(ing.ingredientId, {
           name: ing.ingredient.name,
           per100: {
             kcal: ing.ingredient.kcalPer100g,
             p: ing.ingredient.proteinPer100g,
             c: ing.ingredient.carbsPer100g,
-            f: ing.ingredient.fatPer100g
-          }
+            f: ing.ingredient.fatPer100g,
+          },
         });
       });
       setIngredientData(dataMap);
     }
   }, [initialData]);
 
-  const watchedIngredients = form.watch('ingredients');
-  const watchedBaseServings = form.watch('baseServings');
+  const watchedIngredients = form.watch("ingredients");
+  const watchedBaseServings = form.watch("baseServings");
 
   // Calculate nutrition per serving
   const nutritionPerServing = (() => {
@@ -104,7 +107,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
       }
 
       const ingredientsWithData = watchedIngredients
-        .map(ing => {
+        .map((ing) => {
           const data = ingredientData.get(ing.ingredientId);
           if (!data) return null;
           return {
@@ -113,8 +116,8 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
               kcalPer100g: data.per100.kcal,
               proteinPer100g: data.per100.p,
               carbsPer100g: data.per100.c,
-              fatPer100g: data.per100.f
-            }
+              fatPer100g: data.per100.f,
+            },
           };
         })
         .filter(Boolean);
@@ -125,7 +128,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
 
       return calcRecipePerServing({
         baseServings: watchedBaseServings,
-        ingredients: ingredientsWithData as any
+        ingredients: ingredientsWithData as any,
       });
     } catch {
       return { kcal: 0, p: 0, c: 0, f: 0 };
@@ -141,19 +144,24 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
   }) => {
     append({
       ingredientId: ingredient.ingredientId,
-      gramsPerBase: 100
+      gramsPerBase: 100,
     });
 
-    setIngredientData(prev => new Map(prev.set(ingredient.ingredientId, {
-      name: ingredient.name,
-      per100: ingredient.per100
-    })));
+    setIngredientData(
+      (prev) =>
+        new Map(
+          prev.set(ingredient.ingredientId, {
+            name: ingredient.name,
+            per100: ingredient.per100,
+          }),
+        ),
+    );
   };
 
   const handleRemoveIngredient = (index: number) => {
     const ingredient = watchedIngredients[index];
     if (ingredient) {
-      setIngredientData(prev => {
+      setIngredientData((prev) => {
         const newMap = new Map(prev);
         newMap.delete(ingredient.ingredientId);
         return newMap;
@@ -167,12 +175,12 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
     try {
       const submitData = {
         title: data.title,
-        cuisine: data.cuisine || '',
-        difficulty: data.difficulty || '',
+        cuisine: data.cuisine || "",
+        difficulty: data.difficulty || "",
         utensils: data.utensils,
         baseServings: data.baseServings,
         instructions: data.instructions,
-        ingredients: data.ingredients
+        ingredients: data.ingredients,
       };
 
       if (isEditing && initialData?.id) {
@@ -181,7 +189,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
         await createRecipe(submitData);
       }
     } catch (error) {
-      console.error('Save failed:', error);
+      console.error("Save failed:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -191,7 +199,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
     <div className="max-w-4xl mx-auto space-y-6">
       <Card className="p-6">
         <h2 className="text-2xl font-bold mb-6">
-          {isEditing ? 'Edit Recipe' : 'Create New Recipe'}
+          {isEditing ? "Edit Recipe" : "Create New Recipe"}
         </h2>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -201,7 +209,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
               <Label htmlFor="title">Recipe Title *</Label>
               <Input
                 id="title"
-                {...form.register('title')}
+                {...form.register("title")}
                 placeholder="Enter recipe name"
               />
               {form.formState.errors.title && (
@@ -215,7 +223,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
               <Label htmlFor="cuisine">Cuisine</Label>
               <Input
                 id="cuisine"
-                {...form.register('cuisine')}
+                {...form.register("cuisine")}
                 placeholder="e.g., Italian, Asian, Mexican"
               />
             </div>
@@ -224,8 +232,9 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
               <Label htmlFor="difficulty">Difficulty</Label>
               <select
                 id="difficulty"
-                {...form.register('difficulty')}
+                {...form.register("difficulty")}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                aria-describedby="difficulty-help"
               >
                 <option value="">Select difficulty</option>
                 <option value="Easy">Easy</option>
@@ -234,6 +243,9 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
                 <option value="Fast">Fast</option>
                 <option value="Long">Long</option>
               </select>
+              <p id="difficulty-help" className="sr-only">
+                Choose the preparation difficulty level for this recipe.
+              </p>
             </div>
 
             <div>
@@ -244,7 +256,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
                 step="0.5"
                 min="0.5"
                 max="20"
-                {...form.register('baseServings', { valueAsNumber: true })}
+                {...form.register("baseServings", { valueAsNumber: true })}
               />
               {form.formState.errors.baseServings && (
                 <p className="text-sm text-red-600 mt-1">
@@ -258,8 +270,8 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
           <div>
             <Label>Utensils & Equipment</Label>
             <ChipInput
-              value={form.watch('utensils')}
-              onChange={(value: string[]) => form.setValue('utensils', value)}
+              value={form.watch("utensils")}
+              onChange={(value: string[]) => form.setValue("utensils", value)}
               placeholder="Add utensils (e.g., blender, oven, pan)"
             />
           </div>
@@ -288,35 +300,38 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
             <div className="space-y-3">
               {fields.map((field, index) => {
                 const ingredient = watchedIngredients[index];
-                const data = ingredient ? ingredientData.get(ingredient.ingredientId) : null;
-                
+                const data = ingredient
+                  ? ingredientData.get(ingredient.ingredientId)
+                  : null;
+
                 return (
                   <Card key={field.id} className="p-4">
                     <div className="flex items-center gap-4">
                       <div className="flex-1">
                         <div className="font-medium text-sm">
-                          {data?.name || 'Unknown ingredient'}
+                          {data?.name || "Unknown ingredient"}
                         </div>
                         {data && (
                           <div className="text-xs text-gray-600">
-                            {data.per100.kcal} kcal/100g • 
-                            P: {data.per100.p}g • 
-                            C: {data.per100.c}g • 
-                            F: {data.per100.f}g
+                            {data.per100.kcal} kcal/100g • P: {data.per100.p}g •
+                            C: {data.per100.c}g • F: {data.per100.f}g
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="w-24">
                         <Input
                           type="number"
                           min="1"
                           max="5000"
                           placeholder="grams"
-                          {...form.register(`ingredients.${index}.gramsPerBase`, { valueAsNumber: true })}
+                          {...form.register(
+                            `ingredients.${index}.gramsPerBase`,
+                            { valueAsNumber: true },
+                          )}
                         />
                       </div>
-                      
+
                       <Button
                         type="button"
                         variant="outline"
@@ -329,7 +344,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
                   </Card>
                 );
               })}
-              
+
               {fields.length === 0 && (
                 <Card className="p-8 text-center">
                   <p className="text-gray-500 mb-4">No ingredients added yet</p>
@@ -351,7 +366,7 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
             <Label htmlFor="instructions">Instructions *</Label>
             <textarea
               id="instructions"
-              {...form.register('instructions')}
+              {...form.register("instructions")}
               rows={6}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               placeholder="Enter step-by-step cooking instructions..."
@@ -370,7 +385,9 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
             <h4 className="font-semibold mb-2">Nutrition Per Serving</h4>
             <div className="grid grid-cols-4 gap-4 text-center">
               <div>
-                <div className="text-lg font-bold">{formattedNutrition.kcal}</div>
+                <div className="text-lg font-bold">
+                  {formattedNutrition.kcal}
+                </div>
                 <div className="text-xs text-gray-600">kcal</div>
               </div>
               <div>
@@ -390,12 +407,12 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
 
           {/* Actions */}
           <div className="flex gap-4">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1"
-            >
-              {isSubmitting ? 'Saving...' : (isEditing ? 'Update Recipe' : 'Create Recipe')}
+            <Button type="submit" disabled={isSubmitting} className="flex-1">
+              {isSubmitting
+                ? "Saving..."
+                : isEditing
+                  ? "Update Recipe"
+                  : "Create Recipe"}
             </Button>
             <Button
               type="button"

@@ -357,12 +357,24 @@ export default function IntakePage() {
               </div>
             </Field>
 
-            <Field label="Activity Level" error={errors.activity?.message}>
+            <Field
+              label="Activity Level"
+              error={errors.activity?.message}
+              id="activity"
+            >
               <Select
                 value={watch("activity")}
                 onValueChange={(value) => setValue("activity", value)}
               >
-                <SelectTrigger>
+                <SelectTrigger
+                  id="activity-trigger"
+                  aria-labelledby="activity-label"
+                  aria-describedby={
+                    errors.activity?.message
+                      ? "activity-error"
+                      : "activity-help"
+                  }
+                >
                   <SelectValue placeholder="Select activity level" />
                 </SelectTrigger>
                 <SelectContent>
@@ -373,14 +385,24 @@ export default function IntakePage() {
                   ))}
                 </SelectContent>
               </Select>
+              <p id="activity-help" className="sr-only">
+                Choose your daily activity level to calculate proper macro
+                targets.
+              </p>
             </Field>
 
-            <Field label="Goal" error={errors.goal?.message}>
+            <Field label="Goal" error={errors.goal?.message} id="goal">
               <Select
                 value={watch("goal")}
                 onValueChange={(value) => setValue("goal", value)}
               >
-                <SelectTrigger>
+                <SelectTrigger
+                  id="goal-trigger"
+                  aria-labelledby="goal-label"
+                  aria-describedby={
+                    errors.goal?.message ? "goal-error" : "goal-help"
+                  }
+                >
                   <SelectValue placeholder="Select goal" />
                 </SelectTrigger>
                 <SelectContent>
@@ -391,6 +413,10 @@ export default function IntakePage() {
                   ))}
                 </SelectContent>
               </Select>
+              <p id="goal-help" className="sr-only">
+                Select your primary fitness goal for personalized macro
+                recommendations.
+              </p>
             </Field>
           </CardContent>
         </Card>

@@ -8,6 +8,7 @@ interface FieldProps {
   children: ReactNode;
   htmlFor?: string;
   required?: boolean;
+  id?: string;
 }
 
 export function Field({
@@ -17,13 +18,16 @@ export function Field({
   children,
   htmlFor,
   required = false,
+  id,
 }: FieldProps) {
-  const errorId = error ? `${htmlFor}-error` : undefined;
-  const hintId = hint ? `${htmlFor}-hint` : undefined;
+  const fieldId = id || htmlFor;
+  const labelId = fieldId ? `${fieldId}-label` : undefined;
+  const errorId = error && fieldId ? `${fieldId}-error` : undefined;
+  const hintId = hint && fieldId ? `${fieldId}-hint` : undefined;
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={htmlFor} className="text-sm font-medium">
+      <Label id={labelId} htmlFor={htmlFor} className="text-sm font-medium">
         {label}
         {required && (
           <span className="text-destructive ml-1" aria-label="required">

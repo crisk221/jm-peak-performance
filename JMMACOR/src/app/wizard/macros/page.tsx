@@ -419,12 +419,18 @@ export default function MacrosPage() {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="activity">Activity Level</Label>
+              <Label id="activity-label" htmlFor="activity">
+                Activity Level
+              </Label>
               <Select
                 value={watchedValues.activity}
                 onValueChange={(value) => form.setValue("activity", value)}
               >
-                <SelectTrigger>
+                <SelectTrigger
+                  id="activity-trigger"
+                  aria-labelledby="activity-label"
+                  aria-describedby="activity-help"
+                >
                   <SelectValue placeholder="Select your activity level" />
                 </SelectTrigger>
                 <SelectContent>
@@ -435,15 +441,24 @@ export default function MacrosPage() {
                   ))}
                 </SelectContent>
               </Select>
+              <p id="activity-help" className="sr-only">
+                Choose your daily activity level for accurate calorie
+                calculations.
+              </p>
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="goal">Goal</Label>
+              <Label id="goal-label" htmlFor="goal">
+                Goal
+              </Label>
               <Select
                 value={watchedValues.goal}
                 onValueChange={(value) => form.setValue("goal", value)}
               >
-                <SelectTrigger>
+                <SelectTrigger
+                  id="goal-trigger"
+                  aria-labelledby="goal-label"
+                  aria-describedby="goal-help"
+                >
                   <SelectValue placeholder="Select your goal" />
                 </SelectTrigger>
                 <SelectContent>
@@ -454,8 +469,11 @@ export default function MacrosPage() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-
+              <p id="goal-help" className="sr-only">
+                Select your primary fitness goal for personalized macro
+                recommendations.
+              </p>
+            </div>{" "}
             <div className="space-y-2">
               <Label>BMR Formula</Label>
               <RadioGroup
