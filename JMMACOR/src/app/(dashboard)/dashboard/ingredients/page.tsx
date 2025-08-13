@@ -1,15 +1,24 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { listIngredients, deleteIngredient } from '@/app/actions/ingredients';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
-import { useToast } from '@/lib/hooks/useToast';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { listIngredients, deleteIngredient } from "@/app/actions/ingredients";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { SectionHeader } from "@/components/section-header";
+import { EmptyState } from "@/components/empty-state";
+import { Plus, Search, Edit, Trash2, Carrot, Upload } from "lucide-react";
+import { useToast } from "@/lib/hooks/useToast";
+import Link from "next/link";
 
 interface Ingredient {
   id: string;
@@ -24,7 +33,7 @@ interface Ingredient {
 export default function IngredientsPage() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -38,7 +47,7 @@ export default function IngredientsPage() {
       setTotalPages(result.totalPages);
       setCurrentPage(result.page);
     } catch (error) {
-      addToast('Failed to load ingredients', 'error');
+      addToast("Failed to load ingredients", "error");
     } finally {
       setLoading(false);
     }
@@ -50,7 +59,7 @@ export default function IngredientsPage() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (searchTerm !== '') {
+      if (searchTerm !== "") {
         loadIngredients(searchTerm, 1);
       } else {
         loadIngredients(undefined, 1);
@@ -68,12 +77,12 @@ export default function IngredientsPage() {
     try {
       setDeleting(id);
       await deleteIngredient(id);
-      addToast('Ingredient deleted successfully', 'success');
+      addToast("Ingredient deleted successfully", "success");
       loadIngredients(searchTerm, currentPage);
     } catch (error) {
       addToast(
-        error instanceof Error ? error.message : 'Failed to delete ingredient',
-        'error'
+        error instanceof Error ? error.message : "Failed to delete ingredient",
+        "error",
       );
     } finally {
       setDeleting(null);
@@ -82,29 +91,32 @@ export default function IngredientsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Ingredients</h1>
+      <SectionHeader
+        title="Ingredients"
+        description="Manage your ingredient library and nutrition database"
+      >
         <div className="flex items-center gap-2">
-          <Link href="/dashboard/ingredients/import">
-            <Button variant="outline">
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/ingredients/import">
+              <Upload className="h-4 w-4 mr-2" />
               Import CSV/Excel
-            </Button>
-          </Link>
-          <Link href="/dashboard/ingredients/new">
-            <Button>
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/dashboard/ingredients/new">
               <Plus className="h-4 w-4 mr-2" />
               Add Ingredient
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
-      </div>
+      </SectionHeader>
 
       <Card>
         <CardHeader>
           <CardTitle>Ingredient Library</CardTitle>
           <div className="flex items-center space-x-2">
             <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-graphite dark:text-paper/50 h-4 w-4" />
               <Input
                 placeholder="Search ingredients..."
                 value={searchTerm}
@@ -118,9 +130,34 @@ export default function IngredientsPage() {
           {loading ? (
             <div className="text-center py-8">Loading ingredients...</div>
           ) : ingredients.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {searchTerm ? 'No ingredients found matching your search.' : 'No ingredients yet. Add your first ingredient!'}
-            </div>
+            searchTerm ? (
+              <EmptyState
+                icon={Carrot}
+                title="No ingredients found"
+                body="No ingredients found matching your search."
+                primary={{
+                  label: "Add Ingredient",
+                  onClick: () =>
+                    (window.location.href = "/dashboard/ingredients/new"),
+                }}
+              />
+            ) : (
+              <EmptyState
+                icon={Carrot}
+                title="No ingredients yet"
+                body="Add your first ingredient to start building your nutrition database!"
+                primary={{
+                  label: "Add Ingredient",
+                  onClick: () =>
+                    (window.location.href = "/dashboard/ingredients/new"),
+                }}
+                secondary={{
+                  label: "Import from CSV",
+                  onClick: () =>
+                    (window.location.href = "/dashboard/ingredients/import"),
+                }}
+              />
+            )
           ) : (
             <>
               <Table>
@@ -138,15 +175,25 @@ export default function IngredientsPage() {
                 <TableBody>
                   {ingredients.map((ingredient) => (
                     <TableRow key={ingredient.id}>
-                      <TableCell className="font-medium">{ingredient.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {ingredient.name}
+                      </TableCell>
                       <TableCell>{ingredient.kcalPer100g.toFixed(1)}</TableCell>
-                      <TableCell>{ingredient.proteinPer100g.toFixed(1)}g</TableCell>
-                      <TableCell>{ingredient.carbsPer100g.toFixed(1)}g</TableCell>
+                      <TableCell>
+                        {ingredient.proteinPer100g.toFixed(1)}g
+                      </TableCell>
+                      <TableCell>
+                        {ingredient.carbsPer100g.toFixed(1)}g
+                      </TableCell>
                       <TableCell>{ingredient.fatPer100g.toFixed(1)}g</TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {ingredient.allergens.map((allergen) => (
-                            <Badge key={allergen} variant="secondary" className="text-xs">
+                            <Badge
+                              key={allergen}
+                              variant="secondary"
+                              className="text-xs"
+                            >
                               {allergen}
                             </Badge>
                           ))}
@@ -154,7 +201,9 @@ export default function IngredientsPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <Link href={`/dashboard/ingredients/${ingredient.id}`}>
+                          <Link
+                            href={`/dashboard/ingredients/${ingredient.id}`}
+                          >
                             <Button variant="ghost" size="sm">
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -162,7 +211,9 @@ export default function IngredientsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDelete(ingredient.id, ingredient.name)}
+                            onClick={() =>
+                              handleDelete(ingredient.id, ingredient.name)
+                            }
                             disabled={deleting === ingredient.id}
                           >
                             <Trash2 className="h-4 w-4" />
