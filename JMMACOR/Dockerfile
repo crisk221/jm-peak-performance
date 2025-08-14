@@ -3,9 +3,9 @@ FROM mcr.microsoft.com/playwright:v1.45.0-jammy
 
 WORKDIR /app
 
-    # Install pnpm directly instead of using corepack
-    COPY package.json pnpm-lock.yaml* ./
-    RUN npm install -g pnpm@latest
+    # Install and pin specific pnpm version for reproducible builds
+    COPY package.json pnpm-lock.yaml ./
+    RUN npm install -g pnpm@9.12.2
     RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm prisma generate
