@@ -13,8 +13,7 @@ services:
         sync: false
       - key: NEXT_PUBLIC_APP_URL
         sync: false
-    postDeployCommand: |
-      pnpm prisma db push && pnpm admin:create
+    postDeployCommand: pnpm prisma db push && pnpm admin:create
 
   - type: cron
     name: nightly-json-backup
@@ -24,9 +23,4 @@ services:
     envVars:
       - key: BACKUP_URL
         sync: false
-    dockerCommand: |
-      sh -lc 'set -e;
-      if [ -z "$BACKUP_URL" ]; then echo "BACKUP_URL not set"; exit 1; fi;
-      echo "Downloading $BACKUP_URL";
-      curl -sS "$BACKUP_URL" -o "export-$(date +%Y%m%d).json";
-      ls -lh export-*.json;'
+    dockerCommand: sh -c 'curl -sS "$BACKUP_URL" -o "export-$(date +%Y%m%d).json" && ls -lh export-*.json'
