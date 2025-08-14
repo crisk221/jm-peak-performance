@@ -6,7 +6,7 @@ WORKDIR /app
     # Install pnpm directly instead of using corepack
     COPY package.json pnpm-lock.yaml* ./
     RUN npm install -g pnpm@latest
-    RUN pnpm install --frozen-lockfile# App
+    RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm prisma generate
 RUN pnpm build
