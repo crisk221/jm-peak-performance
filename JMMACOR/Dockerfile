@@ -3,12 +3,10 @@ FROM mcr.microsoft.com/playwright:v1.45.0-jammy
 
 WORKDIR /app
 
-# Corepack + pnpm
-COPY package.json pnpm-lock.yaml* ./
-RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN pnpm install --frozen-lockfile
-
-# App
+    # Install pnpm directly instead of using corepack
+    COPY package.json pnpm-lock.yaml* ./
+    RUN npm install -g pnpm@latest
+    RUN pnpm install --frozen-lockfile# App
 COPY . .
 RUN pnpm prisma generate
 RUN pnpm build
