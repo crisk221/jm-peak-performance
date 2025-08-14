@@ -15,6 +15,9 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 
+# Install pnpm in builder stage
+RUN corepack enable && corepack prepare pnpm@9.12.2 --activate
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
