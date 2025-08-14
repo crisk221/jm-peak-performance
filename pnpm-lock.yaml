@@ -7,6 +7,9 @@ settings:
 importers:
   .:
     dependencies:
+      "@prisma/client":
+        specifier: ^5.22.0
+        version: 5.22.0(prisma@5.22.0)
       xlsx:
         specifier: ^0.18.5
         version: 0.18.5
@@ -41,6 +44,9 @@ importers:
       pnpm:
         specifier: ^9.5.0
         version: 9.15.9
+      prisma:
+        specifier: ^5.22.0
+        version: 5.22.0
       tsx:
         specifier: ^4.20.3
         version: 4.20.3

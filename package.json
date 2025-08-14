@@ -21,6 +21,7 @@
     "db:migrate": "pnpm --filter @jmpp/db prisma migrate dev",
     "db:seed": "pnpm --filter @jmpp/db prisma db seed",
     "ingredients:import": "tsx packages/db/scripts/import-ingredients.ts",
+    "prisma:generate": "prisma generate",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -34,6 +35,7 @@
     "lint-staged": "^16.1.4",
     "pg": "^8.12.0",
     "pnpm": "^9.5.0",
+    "prisma": "^5.22.0",
     "tsx": "^4.20.3",
     "vitest": "^3.2.4"
   },
@@ -48,6 +50,7 @@
     ]
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "xlsx": "^0.18.5"
   }
 }

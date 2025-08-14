@@ -8,7 +8,7 @@ WORKDIR /app
     RUN npm install -g pnpm@9.12.2
     RUN pnpm install --frozen-lockfile
 COPY . .
-RUN pnpm prisma generate
+RUN pnpm run prisma:generate
 RUN pnpm build
 
 ENV NODE_ENV=production
