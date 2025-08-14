@@ -2,11 +2,13 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "@/components/mode-toggle";
 import { SkipToContent } from "@/components/skip-to-content";
+import { appSettings } from "@/lib/app-settings";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -27,37 +29,47 @@ export function AppShell({ children }: AppShellProps) {
                 className="flex items-center gap-3 focus-ring rounded-md min-h-[40px]"
                 aria-label="JM Peak Performance Home"
               >
-                <div className="h-8 w-8 text-primary">
-                  <svg
-                    viewBox="0 0 40 40"
-                    fill="none"
-                    className="h-full w-full"
-                    aria-hidden="true"
-                  >
-                    <circle
-                      cx="20"
-                      cy="20"
-                      r="18"
-                      fill="currentColor"
-                      stroke="currentColor"
-                      strokeWidth="2"
+                {appSettings.logoUrl ? (
+                  <div className="h-8 relative">
+                    <Image
+                      src={appSettings.logoUrl}
+                      alt={appSettings.brandName}
+                      height={32}
+                      width={120}
+                      className="h-8 w-auto"
+                      priority
                     />
-                    <text
-                      x="20"
-                      y="26"
-                      textAnchor="middle"
-                      fill="white"
-                      fontFamily="Arial, sans-serif"
-                      fontSize="16"
-                      fontWeight="bold"
+                  </div>
+                ) : (
+                  <div className="h-8 w-8 text-primary">
+                    <svg
+                      viewBox="0 0 40 40"
+                      fill="none"
+                      className="h-full w-full"
+                      aria-hidden="true"
                     >
-                      JM
-                    </text>
-                  </svg>
-                </div>
-                <span className="text-lg font-semibold text-ink">
-                  JM Peak Performance
-                </span>
+                      <circle
+                        cx="20"
+                        cy="20"
+                        r="18"
+                        fill="currentColor"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      />
+                      <text
+                        x="20"
+                        y="26"
+                        textAnchor="middle"
+                        fill="white"
+                        fontFamily="Arial, sans-serif"
+                        fontSize="16"
+                        fontWeight="bold"
+                      >
+                        JM
+                      </text>
+                    </svg>
+                  </div>
+                )}
               </Link>
             </div>
 

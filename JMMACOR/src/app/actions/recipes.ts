@@ -1,16 +1,16 @@
-'use server';
+"use server";
 
-import { PrismaClient } from '@prisma/client';
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { PrismaClient } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 const prisma = new PrismaClient();
 
-export async function listRecipes({ 
-  q = '', 
-  cuisine = '', 
-  page = 1, 
-  pageSize = 20 
+export async function listRecipes({
+  q = "",
+  cuisine = "",
+  page = 1,
+  pageSize = 20,
 }: {
   q?: string;
   cuisine?: string;
@@ -18,17 +18,16 @@ export async function listRecipes({
   pageSize?: number;
 } = {}) {
   const skip = (page - 1) * pageSize;
-  
+
   const where = {
     AND: [
-      q ? {
-        OR: [
-          { name: { contains: q, mode: 'insensitive' as const } },
-          { cuisine: { contains: q, mode: 'insensitive' as const } }
-        ]
-      } : {},
-      cuisine ? { cuisine: { equals: cuisine, mode: 'insensitive' as const } } : {}
-    ]
+      q
+        ? {
+            OR: [{ name: { contains: q } }, { cuisine: { contains: q } }],
+          }
+        : {},
+      cuisine ? { cuisine: { equals: cuisine } } : {},
+    ],
   };
 
   const [items, total] = await Promise.all([
@@ -37,34 +36,42 @@ export async function listRecipes({
       include: {
         ingredients: {
           include: {
-            ingredient: true
-          }
-        }
+            ingredient: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       skip,
-      take: pageSize
+      take: pageSize,
     }),
-    prisma.recipe.count({ where })
+    prisma.recipe.count({ where }),
   ]);
 
   // Calculate nutrition per serving for each recipe
-  const itemsWithNutrition = items.map(recipe => {
-    const totalKcal = recipe.ingredients.reduce((sum, ri) => 
-      sum + (ri.gramsPerBase * ri.ingredient.kcalPer100g / 100), 0);
-    const totalProtein = recipe.ingredients.reduce((sum, ri) => 
-      sum + (ri.gramsPerBase * ri.ingredient.proteinPer100g / 100), 0);
-    const totalCarbs = recipe.ingredients.reduce((sum, ri) => 
-      sum + (ri.gramsPerBase * ri.ingredient.carbsPer100g / 100), 0);
-    const totalFat = recipe.ingredients.reduce((sum, ri) => 
-      sum + (ri.gramsPerBase * ri.ingredient.fatPer100g / 100), 0);
+  const itemsWithNutrition = items.map((recipe) => {
+    const totalKcal = recipe.ingredients.reduce(
+      (sum, ri) => sum + (ri.gramsPerBase * ri.ingredient.kcalPer100g) / 100,
+      0,
+    );
+    const totalProtein = recipe.ingredients.reduce(
+      (sum, ri) => sum + (ri.gramsPerBase * ri.ingredient.proteinPer100g) / 100,
+      0,
+    );
+    const totalCarbs = recipe.ingredients.reduce(
+      (sum, ri) => sum + (ri.gramsPerBase * ri.ingredient.carbsPer100g) / 100,
+      0,
+    );
+    const totalFat = recipe.ingredients.reduce(
+      (sum, ri) => sum + (ri.gramsPerBase * ri.ingredient.fatPer100g) / 100,
+      0,
+    );
 
     return {
       ...recipe,
       kcalPerServing: Math.round(totalKcal / recipe.baseServings),
       proteinPerServing: Math.round(totalProtein / recipe.baseServings),
       carbsPerServing: Math.round(totalCarbs / recipe.baseServings),
-      fatPerServing: Math.round(totalFat / recipe.baseServings)
+      fatPerServing: Math.round(totalFat / recipe.baseServings),
     };
   });
 
@@ -77,14 +84,14 @@ export async function getRecipe(id: string) {
     include: {
       ingredients: {
         include: {
-          ingredient: true
-        }
-      }
-    }
+          ingredient: true,
+        },
+      },
+    },
   });
 
   if (!recipe) {
-    throw new Error('Recipe not found');
+    throw new Error("Recipe not found");
   }
 
   return recipe;
@@ -108,37 +115,42 @@ export async function createRecipe(input: {
         difficulty: input.difficulty || null,
         utensils: JSON.stringify(input.utensils),
         baseServings: input.baseServings,
-        instructions: input.instructions
-      }
+        instructions: input.instructions,
+      },
     });
 
-    // Create recipe ingredients
-    const ingredientRows = input.ingredients.map(ing => ({
-      recipeId: recipe.id,
-      ingredientId: ing.ingredientId,
-      gramsPerBase: Math.max(1, Math.min(5000, ing.gramsPerBase)) // Clamp between 1-5000
-    }));
+    // Create recipe ingredients (only if there are ingredients)
+    if (input.ingredients.length > 0) {
+      const ingredientRows = input.ingredients.map((ing) => ({
+        recipeId: recipe.id,
+        ingredientId: ing.ingredientId,
+        gramsPerBase: Math.max(1, Math.min(5000, ing.gramsPerBase)), // Clamp between 1-5000
+      }));
 
-    await tx.recipeIngredient.createMany({
-      data: ingredientRows
-    });
+      await tx.recipeIngredient.createMany({
+        data: ingredientRows,
+      });
+    }
 
     return recipe;
   });
 
-  revalidatePath('/dashboard/recipes');
-  redirect('/dashboard/recipes');
+  revalidatePath("/dashboard/recipes");
+  redirect("/dashboard/recipes");
 }
 
-export async function updateRecipe(id: string, input: {
-  title: string;
-  cuisine?: string;
-  difficulty?: string;
-  utensils: string[];
-  baseServings: number;
-  instructions: string;
-  ingredients: Array<{ ingredientId: string; gramsPerBase: number }>;
-}) {
+export async function updateRecipe(
+  id: string,
+  input: {
+    title: string;
+    cuisine?: string;
+    difficulty?: string;
+    utensils: string[];
+    baseServings: number;
+    instructions: string;
+    ingredients: Array<{ ingredientId: string; gramsPerBase: number }>;
+  },
+) {
   await prisma.$transaction(async (tx) => {
     // Update recipe
     await tx.recipe.update({
@@ -149,62 +161,64 @@ export async function updateRecipe(id: string, input: {
         difficulty: input.difficulty || null,
         utensils: JSON.stringify(input.utensils),
         baseServings: input.baseServings,
-        instructions: input.instructions
-      }
+        instructions: input.instructions,
+      },
     });
 
     // Delete existing ingredients
     await tx.recipeIngredient.deleteMany({
-      where: { recipeId: id }
+      where: { recipeId: id },
     });
 
     // Create new ingredients
-    const ingredientRows = input.ingredients.map(ing => ({
+    const ingredientRows = input.ingredients.map((ing) => ({
       recipeId: id,
       ingredientId: ing.ingredientId,
-      gramsPerBase: Math.max(1, Math.min(5000, ing.gramsPerBase)) // Clamp between 1-5000
+      gramsPerBase: Math.max(1, Math.min(5000, ing.gramsPerBase)), // Clamp between 1-5000
     }));
 
     await tx.recipeIngredient.createMany({
-      data: ingredientRows
+      data: ingredientRows,
     });
   });
 
-  revalidatePath('/dashboard/recipes');
+  revalidatePath("/dashboard/recipes");
   revalidatePath(`/dashboard/recipes/${id}`);
-  redirect('/dashboard/recipes');
+  redirect("/dashboard/recipes");
 }
 
 export async function deleteRecipe(id: string) {
   await prisma.$transaction(async (tx) => {
     // Delete recipe ingredients first
     await tx.recipeIngredient.deleteMany({
-      where: { recipeId: id }
+      where: { recipeId: id },
     });
 
     // Delete recipe
     await tx.recipe.delete({
-      where: { id }
+      where: { id },
     });
   });
 
-  revalidatePath('/dashboard/recipes');
+  revalidatePath("/dashboard/recipes");
 }
 
 export async function duplicateRecipe(id: string) {
   const originalRecipe = await getRecipe(id);
-  
+
   const duplicatedInput = {
     title: `${originalRecipe.name} (copy)`,
-    cuisine: originalRecipe.cuisine || '',
-    difficulty: originalRecipe.difficulty || '',
-    utensils: originalRecipe.utensils ? JSON.parse(originalRecipe.utensils) : [],
+    cuisine: originalRecipe.cuisine || "",
+    difficulty: originalRecipe.difficulty || "",
+    utensils: originalRecipe.utensils
+      ? JSON.parse(originalRecipe.utensils)
+      : [],
     baseServings: originalRecipe.baseServings,
     instructions: originalRecipe.instructions,
-    ingredients: originalRecipe.ingredients.map(ri => ({
+    ingredients: originalRecipe.ingredients.map((ri) => ({
       ingredientId: ri.ingredientId,
-      gramsPerBase: ri.gramsPerBase
-    }))
+      gramsPerBase: ri.gramsPerBase,
+    })),
   };
 
   await createRecipe(duplicatedInput);

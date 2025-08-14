@@ -2,11 +2,12 @@
 
 import { ReactNode } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { appSettings } from "@/lib/app-settings";
+import { logoutAction } from "@/app/actions/auth";
 import {
   BarChart3,
   ChefHat,
@@ -14,6 +15,7 @@ import {
   Download,
   Settings,
   ArrowLeft,
+  LogOut,
 } from "lucide-react";
 
 interface DashboardLayoutProps {
@@ -37,12 +39,22 @@ function SidebarNav() {
       aria-label="Dashboard navigation"
     >
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-ink dark:text-paper">
-          {appSettings.brandName}
-        </h2>
-        <Badge variant="secondary" className="mt-1">
-          Dashboard
-        </Badge>
+        {appSettings.logoUrl ? (
+          <div className="flex items-center justify-center mb-4 p-3 bg-white rounded-lg shadow-sm border border-border/50">
+            <Image
+              src={appSettings.logoUrl}
+              alt={appSettings.brandName}
+              height={48}
+              width={240}
+              className="h-12 w-auto object-contain"
+              priority
+            />
+          </div>
+        ) : (
+          <h2 className="text-lg font-semibold text-ink dark:text-paper mb-4">
+            {appSettings.brandName}
+          </h2>
+        )}
       </div>
 
       <Separator className="mb-4" />
@@ -101,6 +113,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Button asChild className="focus-ring">
                 <Link href="/wizard/intake">New Client Wizard</Link>
               </Button>
+              <form action={logoutAction}>
+                <Button
+                  type="submit"
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Log out
+                </Button>
+              </form>
             </div>
           </div>
         </header>

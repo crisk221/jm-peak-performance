@@ -1,8 +1,11 @@
-'use server';
+"use server";
 
-import { PrismaClient } from '@prisma/client';
-import { revalidatePath } from 'next/cache';
-import { ingredientSchema, type IngredientFormData } from '@/schemas/ingredient';
+import { PrismaClient } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+import {
+  ingredientSchema,
+  type IngredientFormData,
+} from "@/schemas/ingredient";
 
 const prisma = new PrismaClient();
 
@@ -15,9 +18,13 @@ export interface IngredientInput {
   allergens: string[];
 }
 
-export async function listIngredients(searchTerm?: string, page: number = 1, limit: number = 20) {
+export async function listIngredients(
+  searchTerm?: string,
+  page: number = 1,
+  limit: number = 20,
+) {
   const offset = (page - 1) * limit;
-  
+
   const where = searchTerm
     ? {
         name: {
@@ -29,7 +36,7 @@ export async function listIngredients(searchTerm?: string, page: number = 1, lim
   const [ingredients, total] = await Promise.all([
     prisma.ingredient.findMany({
       where,
-      orderBy: { name: 'asc' },
+      orderBy: { name: "asc" },
       skip: offset,
       take: limit,
     }),
@@ -37,7 +44,7 @@ export async function listIngredients(searchTerm?: string, page: number = 1, lim
   ]);
 
   // Parse allergens from JSON strings
-  const parsedIngredients = ingredients.map(ingredient => ({
+  const parsedIngredients = ingredients.map((ingredient) => ({
     ...ingredient,
     allergens: ingredient.allergens ? JSON.parse(ingredient.allergens) : [],
   }));
@@ -56,7 +63,7 @@ export async function getIngredient(id: string) {
   });
 
   if (!ingredient) {
-    throw new Error('Ingredient not found');
+    throw new Error("Ingredient not found");
   }
 
   return {
@@ -78,7 +85,7 @@ export async function createIngredient(data: IngredientFormData) {
   });
 
   if (existingIngredient) {
-    throw new Error('An ingredient with this name already exists');
+    throw new Error("An ingredient with this name already exists");
   }
 
   const ingredient = await prisma.ingredient.create({
@@ -88,7 +95,7 @@ export async function createIngredient(data: IngredientFormData) {
     },
   });
 
-  revalidatePath('/dashboard/ingredients');
+  revalidatePath("/dashboard/ingredients");
   return {
     ...ingredient,
     allergens: validatedData.allergens,
@@ -111,7 +118,7 @@ export async function updateIngredient(id: string, data: IngredientFormData) {
   });
 
   if (existingIngredient) {
-    throw new Error('An ingredient with this name already exists');
+    throw new Error("An ingredient with this name already exists");
   }
 
   const ingredient = await prisma.ingredient.update({
@@ -122,7 +129,7 @@ export async function updateIngredient(id: string, data: IngredientFormData) {
     },
   });
 
-  revalidatePath('/dashboard/ingredients');
+  revalidatePath("/dashboard/ingredients");
   revalidatePath(`/dashboard/ingredients/${id}`);
   return {
     ...ingredient,
@@ -137,15 +144,62 @@ export async function deleteIngredient(id: string) {
   });
 
   if (recipeCount > 0) {
-    throw new Error(`Cannot delete ingredient as it is used in ${recipeCount} recipe(s)`);
+    throw new Error(
+      `Cannot delete ingredient as it is used in ${recipeCount} recipe(s)`,
+    );
   }
 
   await prisma.ingredient.delete({
     where: { id },
   });
 
-  revalidatePath('/dashboard/ingredients');
+  revalidatePath("/dashboard/ingredients");
 }
 
 // Alias for recipe components
 export const searchIngredients = listIngredients;
+
+/**
+ * Create or find an ingredient by name for recipe imports
+ * If the ingredient doesn't exist, create it with default nutritional values
+ */
+export async function createOrFindIngredient(
+  name: string,
+): Promise<{ id: string; name: string }> {
+  // First try to find existing ingredient (case insensitive)
+  const existing = await prisma.ingredient.findFirst({
+    where: {
+      name: {
+        contains: name,
+        mode: "insensitive",
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  if (existing) {
+    return existing;
+  }
+
+  // Create new ingredient with placeholder nutritional values
+  // These values are rough estimates that users can update later
+  const newIngredient = await prisma.ingredient.create({
+    data: {
+      name: name.trim(),
+      kcalPer100g: 50, // Generic low-calorie estimate
+      proteinPer100g: 2, // Generic protein estimate
+      carbsPer100g: 10, // Generic carb estimate
+      fatPer100g: 1, // Generic fat estimate
+      allergens: JSON.stringify([]), // No allergens by default
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  return newIngredient;
+}

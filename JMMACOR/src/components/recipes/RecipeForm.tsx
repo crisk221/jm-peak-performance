@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { createRecipe, updateRecipe } from "@/app/actions/recipes";
+import { createOrFindIngredient } from "@/app/actions/ingredients";
 import { recipeSchema, type RecipeFormData } from "@/schemas/recipe";
 import { calcRecipePerServing, formatMacros } from "@/lib/nutrition";
 import { Button } from "@/components/ui/button";
@@ -14,6 +16,9 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ChipInput } from "@/components/ChipInput";
 import IngredientPicker from "./IngredientPicker";
+import { RecipeImport } from "./recipe-import";
+import { Globe } from "lucide-react";
+import type { ExtractedRecipe } from "@/lib/recipe-extract";
 
 interface RecipeFormProps {
   initialData?: {
@@ -46,8 +51,10 @@ interface IngredientRow {
 }
 
 export default function RecipeForm({ initialData }: RecipeFormProps) {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showIngredientPicker, setShowIngredientPicker] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [ingredientData, setIngredientData] = useState<
     Map<string, { name: string; per100: any }>
   >(new Map());
@@ -170,6 +177,41 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
     remove(index);
   };
 
+  const handleImportRecipe = async (extractedRecipe: ExtractedRecipe) => {
+    try {
+      setIsSubmitting(true);
+
+      // Format ingredients as text to include in instructions
+      const ingredientsList = extractedRecipe.ingredients
+        .map((ing) => ing.raw || ing.name || "Unknown ingredient")
+        .join("\n");
+
+      // Combine ingredients and instructions
+      const fullInstructions = `INGREDIENTS:\n${ingredientsList}\n\nINSTRUCTIONS:\n${extractedRecipe.steps.join("\n\n")}`;
+
+      // Prepare recipe data for saving (without ingredients array)
+      const recipeData = {
+        title: extractedRecipe.title || "Imported Recipe",
+        cuisine: extractedRecipe.cuisine || "",
+        difficulty: "", // Not provided by extraction
+        utensils: [], // Not provided by extraction
+        baseServings: extractedRecipe.servings || 4,
+        instructions: fullInstructions,
+        ingredients: [], // Empty array since we're storing ingredients as text
+      };
+
+      // Save the recipe using the existing action
+      await createRecipe(recipeData);
+
+      // Success! The createRecipe action will redirect automatically
+    } catch (error) {
+      console.error("Error importing and saving recipe:", error);
+      alert("Failed to save recipe. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const onSubmit = async (data: RecipeFormData) => {
     setIsSubmitting(true);
     try {
@@ -198,9 +240,22 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-6">
-          {isEditing ? "Edit Recipe" : "Create New Recipe"}
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">
+            {isEditing ? "Edit Recipe" : "Create New Recipe"}
+          </h2>
+          {!isEditing && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowImportModal(true)}
+              className="flex items-center gap-2 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 hover:border-blue-300"
+            >
+              <Globe className="h-4 w-4" />
+              Import from web
+            </Button>
+          )}
+        </div>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Basic Info */}
@@ -432,6 +487,28 @@ export default function RecipeForm({ initialData }: RecipeFormProps) {
             onSelect={handleAddIngredient}
             onClose={() => setShowIngredientPicker(false)}
           />
+        </div>
+      )}
+
+      {/* Recipe Import Modal */}
+      {showImportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-auto">
+            {isSubmitting ? (
+              <div className="p-8 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-lg font-medium">Saving recipe...</p>
+                <p className="text-sm text-gray-600 mt-2">
+                  Matching ingredients and creating recipe
+                </p>
+              </div>
+            ) : (
+              <RecipeImport
+                onSave={handleImportRecipe}
+                onCancel={() => setShowImportModal(false)}
+              />
+            )}
+          </div>
         </div>
       )}
     </div>

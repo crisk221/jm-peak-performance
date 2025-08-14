@@ -1,6 +1,6 @@
-# Personal Trainer Wizard App
+# JM Peak Performance Nutrition App
 
-A Next.js 14 + React + TypeScript application for building a 3-page wizard app for personal trainers.
+A Next.js 14 + React + TypeScript application for building a 3-page wizard app for personal trainers and nutrition coaches.
 
 ## Features
 
@@ -21,16 +21,19 @@ A Next.js 14 + React + TypeScript application for building a 3-page wizard app f
 ## Getting Started
 
 1. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 2. Set up the database:
+
 ```bash
 npx prisma migrate dev
 ```
 
 3. Start the development server:
+
 ```bash
 pnpm dev
 ```
@@ -63,6 +66,7 @@ src/
 ## Macro Calculator
 
 The macro calculator replicates calculator.net behavior:
+
 - Mifflin-St Jeor formula by default
 - Activity multipliers (1.2-1.95 range)
 - Weight goal adjustments

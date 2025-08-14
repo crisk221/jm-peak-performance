@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: jm-peak-performance
+    env: docker
+    plan: starter
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false # set in Render dashboard
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false # set to your production URL after first deploy
+    # Run schema creation + seed admin (safe on empty DB)
+    postDeployCommand: |
+      pnpm prisma db push && pnpm admin:create
+
+  - type: cron
+    name: nightly-json-backup
+    env: docker
+    schedule: "0 13 * * *" # every day 13:00 UTC (adjust)
+    envVars:
+      - key: BACKUP_URL
+        sync: false # https://<your-app-domain>/api/export-json
+    dockerCommand: |
+      sh -lc 'set -e;
+      if [ -z "$BACKUP_URL" ]; then echo "BACKUP_URL not set"; exit 1; fi;
+      echo "Downloading $BACKUP_URL";
+      curl -sS "$BACKUP_URL" -o "export-$(date +%Y%m%d).json";
+      ls -lh export-*.json;
+      # Note: Render cron job containers don't persist files; use logs or plug in object storage later.'
