@@ -1,47 +1,38 @@
-# Multi-stage build to reduce memory usage
-# Stage 1: Build stage
-FROM mcr.microsoft.com/playwright:v1.45.0-jammy AS builder
-
+# ---------- deps (install with lockfile) ----------
+FROM node:20-bullseye-slim AS deps
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 build-essential ca-certificates git \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set Node.js memory limits to prevent OOM
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && corepack prepare pnpm@9.12.2 --activate
+RUN pnpm install --frozen-lockfile
 
-    # Install and pin specific pnpm version for reproducible builds
-    COPY package.json pnpm-lock.yaml ./
-    RUN npm install -g pnpm@9.12.2
-    # Install dependencies with reduced memory footprint
-    RUN pnpm install --frozen-lockfile --reporter=silent
+# ---------- builder (Next build + Prisma generate) ----------
+FROM node:20-bullseye-slim AS builder
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm run prisma:generate
-# Build with memory optimization
-RUN NODE_OPTIONS="--max-old-space-size=3072" pnpm build
 
-# Stage 2: Production stage
-FROM mcr.microsoft.com/playwright:v1.45.0-jammy AS production
+RUN pnpm exec prisma generate
+RUN pnpm build
 
+# ---------- runtime (Playwright for server PDFs) ----------
+FROM mcr.microsoft.com/playwright:v1.45.0-jammy AS runner
 WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install pnpm for production
 RUN npm install -g pnpm@9.12.2
 
-# Copy package files
-COPY package.json pnpm-lock.yaml ./
-
-# Install only production dependencies
-RUN pnpm install --frozen-lockfile --prod --reporter=silent
-
-# Copy built application from builder stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules ./node_modules
+COPY package.json next.config.js ./
 
-# Generate Prisma client for production
-RUN pnpm run prisma:generate
-
-ENV NODE_ENV=production
-ENV PORT=3000
 EXPOSE 3000
-
-# Next.js production start
 CMD ["pnpm","start","-p","3000"]

@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+backups
+playwright-report
+test-results
+.env*
+*.log
+.DS_Store
+.vscode
+.idea
+coverage
+*.tsbuildinfo
