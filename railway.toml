@@ -4,9 +4,4 @@ dockerfilePath = "JMMACOR/Dockerfile"
 
 [deploy]
 healthcheckPath = "/api/health"
-restartPolicyType = "always"
-
-[env]
-NODE_ENV = "production"
-NODE_OPTIONS = "--max-old-space-size=1024"
-GENERATE_SOURCEMAP = "false"
+restartPolicyType = "on_failure"

@@ -1,0 +1,7 @@
+apps/
+packages/
+tests/
+playwright-report/
+node_modules/
+.git/
+*.md
