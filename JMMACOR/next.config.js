@@ -2,7 +2,11 @@
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
-  // Optional: uncomment if build still OOMs
-  // swcMinify: false,
+  // Aggressive memory optimizations
+  swcMinify: false,
+  experimental: {
+    workerThreads: false,
+    cpus: 1,
+  },
 };
 module.exports = nextConfig;

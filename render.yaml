@@ -10,7 +10,9 @@ services:
       - key: NODE_ENV
         value: production
       - key: NODE_OPTIONS
-        value: --max-old-space-size=2048
+        value: --max-old-space-size=1024
+      - key: GENERATE_SOURCEMAP
+        value: false
       - key: DATABASE_URL
         sync: false
       - key: NEXT_PUBLIC_APP_URL
