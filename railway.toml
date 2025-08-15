@@ -6,12 +6,7 @@ dockerfilePath = "JMMACOR/Dockerfile"
 healthcheckPath = "/api/health"
 restartPolicyType = "always"
 
-[[services]]
-name = "jm-peak-performance"
-source = "."
-rootDirectory = "JMMACOR"
-
-[services.variables]
+[env]
 NODE_ENV = "production"
 NODE_OPTIONS = "--max-old-space-size=1024"
 GENERATE_SOURCEMAP = "false"
